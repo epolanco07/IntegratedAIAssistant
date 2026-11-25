@@ -6,22 +6,28 @@ struct SidebarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 10) {
-                AssistantAvatar(size: 32)
+                AssistantAvatar(size: 34)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("JARVIS").font(.headline).tracking(2)
-                    Text("Personal assistant").font(.caption2).foregroundStyle(Theme.textSecondary)
+                    Text("VOICE ASSISTANT").font(.caption2.weight(.medium)).tracking(0.8).foregroundStyle(Theme.accent)
                 }
             }
             .padding(16)
 
-            Button { appState.createConversation() } label: {
-                Label("New conversation", systemImage: "plus").frame(maxWidth: .infinity)
+            Button { appState.selection = .voice } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "mic.fill").font(.headline)
+                    Text("Speak to JARVIS").font(.headline)
+                    Spacer()
+                }
+                .padding(.vertical, 5).padding(.horizontal, 4)
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .tint(Theme.accentDeep)
             .controlSize(.large)
             .padding(.horizontal, 12)
-            .padding(.bottom, 12)
+            .padding(.bottom, 16)
 
             VStack(spacing: 2) {
                 ForEach(SidebarItem.allCases) { item in
@@ -32,7 +38,12 @@ struct SidebarView: View {
             }
             .padding(.horizontal, 8)
 
-            SectionTitle("Conversations")
+            HStack {
+                SectionTitle("Conversations")
+                Button { appState.createConversation() } label: { Image(systemName: "plus") }
+                    .buttonStyle(.plain).foregroundStyle(Theme.textSecondary)
+                    .help("New conversation")
+            }
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
                 .padding(.bottom, 6)
@@ -52,8 +63,12 @@ struct SidebarView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Divider().overlay(Theme.border)
-                StatusBadge(text: "Backend \(appState.connectionStatus.label.lowercased())", kind: .neutral)
-                Text("Interface preview").font(.caption2).foregroundStyle(Theme.warning)
+                HStack(spacing: 7) {
+                    Circle().fill(Theme.warning).frame(width: 7, height: 7)
+                    Text("BACKEND OFFLINE").font(.caption2.weight(.medium)).tracking(0.7)
+                }
+                .foregroundStyle(Theme.warning)
+                Text("Local preview mode").font(.caption2).foregroundStyle(Theme.textSecondary)
             }
             .padding(12)
         }
