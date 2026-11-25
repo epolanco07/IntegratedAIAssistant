@@ -3,7 +3,7 @@ import Observation
 
 @MainActor @Observable
 final class AppState {
-    var selection: SidebarItem = .dashboard
+    var selection: SidebarItem = .voice
     var conversations: [Conversation] = [Conversation(title: "Planning my week", messages: ChatMessage.samples)]
     var selectedConversationID: UUID?
     var connectionStatus: BackendConnectionStatus = .disconnected

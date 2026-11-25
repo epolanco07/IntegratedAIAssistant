@@ -3,7 +3,7 @@ import Foundation
 // Static placeholder data used only to render the UI. Nothing here is live.
 
 enum SidebarItem: String, CaseIterable, Identifiable {
-    case dashboard, chat, voice, settings
+    case voice, dashboard, chat, settings
     var id: String { rawValue }
 
     var title: String {

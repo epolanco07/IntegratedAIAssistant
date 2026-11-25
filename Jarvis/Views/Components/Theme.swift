@@ -6,6 +6,7 @@ enum Theme {
     static let surfaceRaised = Color(red: 0.12, green: 0.14, blue: 0.19)
     static let accent = Color(red: 0.27, green: 0.74, blue: 0.96)
     static let accentDeep = Color(red: 0.16, green: 0.42, blue: 0.88)
+    static let signalViolet = Color(red: 0.48, green: 0.34, blue: 0.94)
     static let textPrimary = Color.white.opacity(0.92)
     static let textSecondary = Color.white.opacity(0.58)
     static let border = Color.white.opacity(0.08)
@@ -54,6 +55,43 @@ struct AssistantAvatar: View {
         }
         .frame(width: size, height: size)
     }
+}
+
+struct CommandOrb: View {
+    enum Mode { case idle, listening, speaking }
+    let mode: Mode
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var isActive: Bool { mode != .idle }
+    private var label: String {
+        switch mode { case .idle: "Activate voice"; case .listening: "Listening"; case .speaking: "Speaking" }
+    }
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion || !isActive)) { timeline in
+            let phase = reduceMotion ? 0 : (sin(timeline.date.timeIntervalSinceReferenceDate * 2.2) + 1) / 2
+            ZStack {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .stroke(signalColor.opacity(0.12 + Double(index) * 0.05), lineWidth: 1)
+                        .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0))
+                }
+                Circle()
+                    .fill(RadialGradient(colors: [signalColor.opacity(0.92), Theme.signalViolet.opacity(0.68), Theme.background], center: .topLeading, startRadius: 5, endRadius: 130))
+                    .frame(width: 188, height: 188)
+                    .shadow(color: signalColor.opacity(isActive ? 0.36 : 0.18), radius: isActive ? 28 : 14, y: 8)
+                Image(systemName: mode == .speaking ? "waveform" : "mic.fill")
+                    .font(.system(size: 36, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.94))
+                    .symbolEffect(.variableColor.iterative, options: .repeating, isActive: mode == .speaking && !reduceMotion)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
+        }
+        .frame(width: 360, height: 360)
+    }
+
+    private var signalColor: Color { mode == .idle ? Theme.accentDeep : Theme.accent }
 }
 
 struct StatusBadge: View {
