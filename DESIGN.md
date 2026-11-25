@@ -14,10 +14,9 @@ Use native macOS typography for clarity. Large, compact titles establish hierarc
 
 ## Color roles
 
-- `background`: blue-black workspace ground.
-- `surface`: elevated navy utility surfaces.
-- `signal`: cyan for available / active system response.
-- `violet`: depth within the voice encounter.
+- `background`: deep blue-black workspace ground.
+- `surface`: blue-teal utility surfaces with high legibility.
+- `signal`: icy cyan for available / active system response and the orb core.
 - semantic amber, green, and red: warnings, connected state, and failure only.
 
 ## Interaction

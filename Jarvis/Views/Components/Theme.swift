@@ -1,17 +1,17 @@
 import SwiftUI
 
 enum Theme {
-    static let background = Color(red: 0.04, green: 0.05, blue: 0.08)
-    static let surface = Color(red: 0.08, green: 0.09, blue: 0.13)
-    static let surfaceRaised = Color(red: 0.12, green: 0.14, blue: 0.19)
-    static let accent = Color(red: 0.27, green: 0.74, blue: 0.96)
-    static let accentDeep = Color(red: 0.16, green: 0.42, blue: 0.88)
-    static let signalViolet = Color(red: 0.48, green: 0.34, blue: 0.94)
-    static let textPrimary = Color.white.opacity(0.92)
-    static let textSecondary = Color.white.opacity(0.58)
-    static let border = Color.white.opacity(0.08)
-    static let success = Color(red: 0.30, green: 0.80, blue: 0.55)
-    static let warning = Color(red: 0.96, green: 0.70, blue: 0.28)
+    static let background = Color(red: 0.025, green: 0.10, blue: 0.14)
+    static let surface = Color(red: 0.045, green: 0.16, blue: 0.21)
+    static let surfaceRaised = Color(red: 0.07, green: 0.23, blue: 0.29)
+    static let accent = Color(red: 0.16, green: 0.84, blue: 1.00)
+    static let accentDeep = Color(red: 0.03, green: 0.48, blue: 0.78)
+    static let signalCore = Color(red: 0.78, green: 0.96, blue: 1.00)
+    static let textPrimary = Color(red: 0.90, green: 0.98, blue: 1.00)
+    static let textSecondary = Color(red: 0.58, green: 0.79, blue: 0.86)
+    static let border = Color(red: 0.25, green: 0.78, blue: 0.90).opacity(0.20)
+    static let success = Color(red: 0.30, green: 0.90, blue: 0.70)
+    static let warning = Color(red: 1.00, green: 0.76, blue: 0.32)
     static let danger = Color(red: 0.95, green: 0.38, blue: 0.40)
 
 }
@@ -29,7 +29,7 @@ private struct CardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(16)
-            .background(Theme.surface.opacity(0.85), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.border))
     }
 }
@@ -72,12 +72,12 @@ struct CommandOrb: View {
                         .stroke(signalColor.opacity(0.12 + Double(index) * 0.05), lineWidth: 1)
                         .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0))
                 }
-                Circle().fill(Theme.background).frame(width: 198, height: 198)
+                Circle().fill(Theme.surface).frame(width: 198, height: 198)
                 Circle().strokeBorder(signalColor.opacity(0.5), lineWidth: 1).frame(width: 188, height: 188)
                 Circle().fill(signalColor.opacity(isActive ? 0.74 : 0.42)).frame(width: 152, height: 152)
                 Circle().strokeBorder(.white.opacity(0.28), lineWidth: 1).frame(width: 116, height: 116)
-                Circle().fill(Theme.background.opacity(0.75)).frame(width: 88, height: 88)
-                Circle().fill(signalColor.opacity(isActive ? 0.95 : 0.75)).frame(width: 50, height: 50)
+                Circle().fill(Theme.background).frame(width: 88, height: 88)
+                Circle().fill(isActive ? Theme.signalCore : signalColor).frame(width: 50, height: 50)
                     .shadow(color: signalColor.opacity(isActive ? 0.32 : 0.14), radius: isActive ? 22 : 12, y: 6)
                 Image(systemName: mode == .speaking ? "waveform" : "mic.fill")
                     .font(.system(size: 36, weight: .medium))
