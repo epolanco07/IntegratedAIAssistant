@@ -22,6 +22,14 @@ __pycache__/
 .venv/
 venv/
 
+## Local Codex and Impeccable tooling
+.codex/
+.agents/
+.impeccable/questions/
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/config.local.json
+
 ## Obj-C/Swift specific
 *.hmap
 
