@@ -4,6 +4,23 @@
 
 ## User settings
 xcuserdata/
+.DS_Store
+
+## Local configuration and generated artifacts
+.env
+.env.*
+!.env.example
+DerivedData/
+build/
+*.xcarchive
+*.mobileprovision
+*.pem
+*.p12
+*.key
+__pycache__/
+*.py[cod]
+.venv/
+venv/
 
 ## Obj-C/Swift specific
 *.hmap
