@@ -30,6 +30,19 @@ struct ChatView: View {
                 .padding(24)
             }
 
+            if let error = appState.chatError {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text(error)
+                    Spacer()
+                    Button("Dismiss") { appState.chatError = nil }.buttonStyle(.link)
+                }
+                .font(.caption)
+                .foregroundStyle(Theme.danger)
+                .padding(.horizontal, 20).padding(.vertical, 8)
+                .background(Theme.danger.opacity(0.1))
+            }
+
             HStack(alignment: .bottom, spacing: 10) {
                 TextField("Message JARVIS…", text: $draft, axis: .vertical)
                     .textFieldStyle(.plain)
@@ -38,6 +51,7 @@ struct ChatView: View {
                     .padding(.vertical, 10)
                     .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.border))
+                    .onSubmit { Task { await send() } }
 
                 Button { Task { await send() } } label: {
                     Image(systemName: "arrow.up")

@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct MessageView: View {
     let message: ChatMessage
@@ -18,6 +19,12 @@ struct MessageView: View {
                             .fill(message.isUser ? Theme.accentDeep.opacity(0.55) : Theme.surfaceRaised)
                     )
                     .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.border))
+                    .contextMenu {
+                        Button("Copy", systemImage: "doc.on.doc") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(message.text, forType: .string)
+                        }
+                    }
                 Text(message.time).font(.caption2).foregroundStyle(Theme.textSecondary)
             }
 

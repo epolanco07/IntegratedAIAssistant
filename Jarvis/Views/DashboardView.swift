@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DashboardView: View {
+    @Environment(AppState.self) private var appState
     private let columns = [GridItem(.adaptive(minimum: 260), spacing: 16)]
 
     var body: some View {
@@ -61,13 +62,22 @@ struct DashboardView: View {
             SectionTitle("Quick actions")
             HStack(spacing: 10) {
                 ForEach([("New conversation", "plus.bubble"), ("Start voice", "mic"), ("Settings", "gearshape")], id: \.0) { item in
-                    Button {} label: {
+                    Button { performQuickAction(item.0) } label: {
                         Label(item.0, systemImage: item.1).padding(.horizontal, 6).padding(.vertical, 4)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large)
                 }
             }
+        }
+    }
+
+    private func performQuickAction(_ title: String) {
+        switch title {
+        case "New conversation": appState.createConversation()
+        case "Start voice": appState.selection = .voice
+        case "Settings": appState.selection = .settings
+        default: break
         }
     }
 
