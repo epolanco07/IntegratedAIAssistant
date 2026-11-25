@@ -26,12 +26,14 @@
       "id": "000000000000000100000000",
       "product": "Products/Jarvis.app",
       "product-type": "application",
+      "last-swift-migration": "27.2",
       "build-phases": [
         "compile-sources",
         "frameworks",
         "resources",
       ],
       "build-settings": {
+        "CLANG_ENABLE_MODULES": "YES",
         "CODE_SIGN_STYLE": "Automatic",
         "CURRENT_PROJECT_VERSION": "1",
         "ENABLE_APP_SANDBOX": "YES",
@@ -60,6 +62,7 @@
         "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
         "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
         "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
         "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
         "SWIFT_VERSION": "5.0",
         "TARGETED_DEVICE_FAMILY": "1,2,7",
