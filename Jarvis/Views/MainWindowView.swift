@@ -1,16 +1,16 @@
 import SwiftUI
 
 struct MainWindowView: View {
-    @State private var selection: SidebarItem = .dashboard
+    @Environment(AppState.self) private var appState
 
     var body: some View {
         NavigationSplitView {
-            SidebarView(selection: $selection)
+            SidebarView()
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
         } detail: {
             ZStack {
                 JarvisBackground()
-                switch selection {
+                switch appState.selection {
                 case .dashboard: DashboardView()
                 case .chat: ChatView()
                 case .voice: VoiceView()

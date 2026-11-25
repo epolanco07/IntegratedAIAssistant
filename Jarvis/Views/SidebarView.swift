@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @Binding var selection: SidebarItem
+    @Environment(AppState.self) private var appState
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -14,7 +14,7 @@ struct SidebarView: View {
             }
             .padding(16)
 
-            Button {} label: {
+            Button { appState.createConversation() } label: {
                 Label("New conversation", systemImage: "plus").frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -25,8 +25,8 @@ struct SidebarView: View {
 
             VStack(spacing: 2) {
                 ForEach(SidebarItem.allCases) { item in
-                    SidebarRow(title: item.title, systemImage: item.systemImage, isSelected: selection == item) {
-                        selection = item
+                    SidebarRow(title: item.title, systemImage: item.systemImage, isSelected: appState.selection == item) {
+                        appState.selection = item
                     }
                 }
             }
@@ -39,9 +39,9 @@ struct SidebarView: View {
 
             ScrollView {
                 VStack(spacing: 2) {
-                    ForEach(ConversationSummary.samples) { convo in
-                        SidebarRow(title: convo.title, systemImage: "text.bubble", isSelected: false) {
-                            selection = .chat
+                    ForEach(appState.conversations) { convo in
+                        SidebarRow(title: convo.title, systemImage: "text.bubble", isSelected: appState.selectedConversationID == convo.id) {
+                            appState.selectConversation(convo.id)
                         }
                     }
                 }
@@ -52,7 +52,7 @@ struct SidebarView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Divider().overlay(Theme.border)
-                StatusBadge(text: "Backend not connected", kind: .neutral)
+                StatusBadge(text: "Backend \(appState.connectionStatus.label.lowercased())", kind: .neutral)
                 Text("Interface preview").font(.caption2).foregroundStyle(Theme.warning)
             }
             .padding(12)

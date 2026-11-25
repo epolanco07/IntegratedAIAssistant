@@ -11,7 +11,7 @@
     ],
   },
   "files": [
-    { "kind": "folder", "path": "Jarvis", "target-membership": [ "Jarvis" ] },
+    { "kind": "folder", "path": ".", "target-membership": [ "Jarvis" ] },
     {
       "kind": "group",
       "name": "Products",

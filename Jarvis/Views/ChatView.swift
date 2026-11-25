@@ -1,17 +1,18 @@
 import SwiftUI
 
 struct ChatView: View {
+    @Environment(AppState.self) private var appState
     @State private var draft = ""
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Planning my week").font(.title3.weight(.semibold))
-                    Text("Sample conversation. Not connected.").font(.caption).foregroundStyle(Theme.warning)
+                    Text(appState.selectedConversation?.title ?? "New conversation").font(.title3.weight(.semibold))
+                    Text("Local mock service. Backend not connected.").font(.caption).foregroundStyle(Theme.warning)
                 }
                 Spacer()
-                Button {} label: { Label("New", systemImage: "square.and.pencil") }
+                Button { appState.createConversation() } label: { Label("New", systemImage: "square.and.pencil") }
                     .buttonStyle(.bordered)
             }
             .padding(.horizontal, 24)
@@ -21,8 +22,10 @@ struct ChatView: View {
 
             ScrollView {
                 LazyVStack(spacing: 18) {
-                    ForEach(ChatMessage.samples) { MessageView(message: $0) }
-                    thinkingRow
+                    if let conversation = appState.selectedConversation, !conversation.messages.isEmpty {
+                        ForEach(conversation.messages) { MessageView(message: $0) }
+                    } else { emptyState }
+                    if appState.isSending { thinkingRow }
                 }
                 .padding(24)
             }
@@ -36,7 +39,7 @@ struct ChatView: View {
                     .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.border))
 
-                Button {} label: {
+                Button { Task { await send() } } label: {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)
@@ -44,9 +47,21 @@ struct ChatView: View {
                         .background(Theme.accentGradient, in: Circle())
                 }
                 .buttonStyle(.plain)
+                .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || appState.isSending)
             }
             .padding(16)
         }
+    }
+
+    private func send() async {
+        let message = draft
+        draft = ""
+        await appState.send(message)
+    }
+
+    private var emptyState: some View {
+        ContentUnavailableView("Start a conversation", systemImage: "bubble.left.and.bubble.right", description: Text("Ask JARVIS anything. This preview uses a local mock response."))
+            .frame(maxWidth: .infinity, minHeight: 280)
     }
 
     /// Static preview of the "thinking" state.
