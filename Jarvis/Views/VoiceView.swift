@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct VoiceView: View {
+    @StateObject private var voiceManager = VoiceManager()
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -16,16 +18,16 @@ struct VoiceView: View {
                 orb.frame(height: 220)
 
                 VStack(spacing: 8) {
-                    Text("Ready").font(.title3.weight(.semibold))
+                    Text(statusTitle).font(.title3.weight(.semibold))
                     HStack(spacing: 8) {
-                        StatusBadge(text: "Microphone not requested", kind: .neutral)
-                        StatusBadge(text: "Playback idle", kind: .neutral)
+                        StatusBadge(text: microphoneLabel, kind: microphoneKind)
+                        StatusBadge(text: voiceManager.player.isSpeaking ? "Playback speaking" : "Playback idle", kind: .neutral)
                     }
                 }
 
                 HStack(spacing: 16) {
-                    Button {} label: {
-                        Label("Push to talk", systemImage: "mic.fill")
+                    Button { Task { await toggleRecording() } } label: {
+                        Label(voiceManager.recorder.state == .recording ? "Stop recording" : "Push to talk", systemImage: "mic.fill")
                             .font(.headline)
                             .padding(.horizontal, 22)
                             .padding(.vertical, 12)
@@ -34,14 +36,14 @@ struct VoiceView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button {} label: { Label("Interrupt", systemImage: "hand.raised.fill") }
+                    Button { voiceManager.interrupt() } label: { Label("Interrupt", systemImage: "hand.raised.fill") }
                         .buttonStyle(.bordered)
-                        .disabled(true)
+                        .disabled(!voiceManager.player.isSpeaking)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     SectionTitle("Live transcript")
-                    Text("Nothing yet. Press the button and speak.")
+                    Text(voiceManager.transcript.isEmpty ? "Audio capture is local only until a backend voice service is connected." : voiceManager.transcript)
                         .foregroundStyle(Theme.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -69,6 +71,37 @@ struct VoiceView: View {
             .frame(maxWidth: 720)
             .frame(maxWidth: .infinity)
         }
+    }
+
+    private var statusTitle: String {
+        switch voiceManager.recorder.state {
+        case .idle: "Ready"
+        case .recording: "Listening"
+        case .denied: "Microphone access needed"
+        case .failed: "Audio unavailable"
+        }
+    }
+
+    private var microphoneLabel: String {
+        switch voiceManager.recorder.state {
+        case .idle: "Microphone ready"
+        case .recording: "Listening"
+        case .denied: "Microphone denied"
+        case .failed: "Microphone error"
+        }
+    }
+
+    private var microphoneKind: StatusBadge.Kind {
+        switch voiceManager.recorder.state {
+        case .recording: .connected
+        case .denied, .failed: .error
+        case .idle: .neutral
+        }
+    }
+
+    private func toggleRecording() async {
+        if voiceManager.recorder.state == .recording { voiceManager.endPushToTalk() }
+        else { await voiceManager.beginPushToTalk() }
     }
 
     private var orb: some View {
