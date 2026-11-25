@@ -6,17 +6,20 @@ struct ChatView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(spacing: 14) {
+                AssistantAvatar(size: 30)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(appState.selectedConversation?.title ?? "New conversation").font(.title3.weight(.semibold))
-                    Text("Local mock service. Backend not connected.").font(.caption).foregroundStyle(Theme.warning)
+                    Text("TEXT CONVERSATION · LOCAL PREVIEW").font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(Theme.warning)
                 }
                 Spacer()
+                Button { appState.selection = .voice } label: { Label("Voice", systemImage: "mic.fill") }
+                    .buttonStyle(.bordered)
                 Button { appState.createConversation() } label: { Label("New", systemImage: "square.and.pencil") }
                     .buttonStyle(.bordered)
             }
             .padding(.horizontal, 24)
-            .padding(.vertical, 14)
+            .padding(.vertical, 18)
 
             Divider().overlay(Theme.border)
 
@@ -43,7 +46,8 @@ struct ChatView: View {
                 .background(Theme.danger.opacity(0.1))
             }
 
-            HStack(alignment: .bottom, spacing: 10) {
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(alignment: .bottom, spacing: 10) {
                 TextField("Message JARVIS…", text: $draft, axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...8)
@@ -62,8 +66,11 @@ struct ChatView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || appState.isSending)
+                }
+                Text("Return to send · Option-Return for a new line")
+                    .font(.caption2).foregroundStyle(Theme.textSecondary)
             }
-            .padding(16)
+            .padding(.horizontal, 20).padding(.top, 14).padding(.bottom, 12)
         }
     }
 
