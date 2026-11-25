@@ -2,7 +2,7 @@
 
 ## Visual world
 
-JARVIS is a voice-first macOS command surface. A deep midnight field gives the speaking encounter quiet focus; cyan and violet signal color communicate state rather than decorate it. Familiar native navigation and controls keep the interface immediately operable.
+JARVIS is a voice-first macOS command surface. A deep midnight field gives the speaking encounter quiet focus; cyan and violet signal color communicate state rather than decorate it. The system uses solid tonal layers and fine structural lines—never gradients. Familiar native navigation and controls keep the interface immediately operable.
 
 ## Signature move
 

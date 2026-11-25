@@ -14,17 +14,12 @@ enum Theme {
     static let warning = Color(red: 0.96, green: 0.70, blue: 0.28)
     static let danger = Color(red: 0.95, green: 0.38, blue: 0.40)
 
-    static let accentGradient = LinearGradient(
-        colors: [accent, accentDeep], startPoint: .topLeading, endPoint: .bottomTrailing
-    )
 }
 
 struct JarvisBackground: View {
     var body: some View {
         ZStack {
             Theme.background
-            RadialGradient(colors: [Theme.accentDeep.opacity(0.16), .clear],
-                           center: .topTrailing, startRadius: 20, endRadius: 600)
         }
         .ignoresSafeArea()
     }
@@ -48,7 +43,8 @@ struct AssistantAvatar: View {
 
     var body: some View {
         ZStack {
-            Circle().fill(Theme.accentGradient)
+            Circle().fill(Theme.accentDeep)
+            Circle().strokeBorder(Theme.accent.opacity(0.75), lineWidth: 1)
             Image(systemName: "sparkle")
                 .font(.system(size: size * 0.46, weight: .semibold))
                 .foregroundStyle(.white)
@@ -76,10 +72,13 @@ struct CommandOrb: View {
                         .stroke(signalColor.opacity(0.12 + Double(index) * 0.05), lineWidth: 1)
                         .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0))
                 }
-                Circle()
-                    .fill(RadialGradient(colors: [signalColor.opacity(0.92), Theme.signalViolet.opacity(0.68), Theme.background], center: .topLeading, startRadius: 5, endRadius: 130))
-                    .frame(width: 188, height: 188)
-                    .shadow(color: signalColor.opacity(isActive ? 0.36 : 0.18), radius: isActive ? 28 : 14, y: 8)
+                Circle().fill(Theme.background).frame(width: 198, height: 198)
+                Circle().strokeBorder(signalColor.opacity(0.5), lineWidth: 1).frame(width: 188, height: 188)
+                Circle().fill(signalColor.opacity(isActive ? 0.74 : 0.42)).frame(width: 152, height: 152)
+                Circle().strokeBorder(.white.opacity(0.28), lineWidth: 1).frame(width: 116, height: 116)
+                Circle().fill(Theme.background.opacity(0.75)).frame(width: 88, height: 88)
+                Circle().fill(signalColor.opacity(isActive ? 0.95 : 0.75)).frame(width: 50, height: 50)
+                    .shadow(color: signalColor.opacity(isActive ? 0.32 : 0.14), radius: isActive ? 22 : 12, y: 6)
                 Image(systemName: mode == .speaking ? "waveform" : "mic.fill")
                     .font(.system(size: 36, weight: .medium))
                     .foregroundStyle(.white.opacity(0.94))

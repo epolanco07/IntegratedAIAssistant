@@ -62,7 +62,7 @@ struct ChatView: View {
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
-                        .background(Theme.accentGradient, in: Circle())
+                        .background(Theme.accentDeep, in: Circle())
                 }
                 .buttonStyle(.plain)
                 .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || appState.isSending)
