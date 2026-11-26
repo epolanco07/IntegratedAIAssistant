@@ -6,7 +6,7 @@ JARVIS is a voice-first macOS holographic command surface. A deep midnight field
 
 ## Signature move
 
-The voice orb is the system’s central radial command menu. Segmented arcs rotate, signal fields expand gently, and the surrounding shortcuts lead to real JARVIS destinations. Input bars animate at a quiet idle cadence and accelerate while recording.
+The voice orb is the system’s central radial command menu. Segmented arcs rotate, signal fields expand gently, and the surrounding shortcuts lead to real JARVIS destinations. The orb is an abstract energy core rather than a microphone symbol; it brightens to signal local continuous listening while JARVIS is open.
 
 ## Type and density
 

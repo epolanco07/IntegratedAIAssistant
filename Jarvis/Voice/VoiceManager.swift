@@ -8,7 +8,11 @@ final class VoiceManager: ObservableObject {
     let recorder = AudioRecorder()
     let player = AudioPlayer()
 
-    func beginPushToTalk() async { await recorder.start() }
-    func endPushToTalk() { recorder.stop() }
+    func startContinuousListening() async {
+        guard recorder.state != .recording else { return }
+        await recorder.start()
+    }
+
+    func pauseListening() { recorder.stop() }
     func interrupt() { player.stop() }
 }

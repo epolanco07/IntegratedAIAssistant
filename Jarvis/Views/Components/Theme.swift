@@ -4,12 +4,12 @@ enum Theme {
     static let background = Color(red: 0.012, green: 0.039, blue: 0.078)
     static let surface = Color(red: 0.027, green: 0.145, blue: 0.247)
     static let surfaceRaised = Color(red: 0.039, green: 0.25, blue: 0.39)
-    static let accent = Color(red: 0.0, green: 0.83, blue: 1.0)
-    static let accentDeep = Color(red: 0.04, green: 0.29, blue: 0.48)
-    static let signalCore = Color(red: 0.81, green: 0.94, blue: 1.0)
+    static let accent = Color(red: 0.0, green: 0.90, blue: 1.0)
+    static let accentDeep = Color(red: 0.02, green: 0.38, blue: 0.65)
+    static let signalCore = Color(red: 0.90, green: 0.98, blue: 1.0)
     static let textPrimary = Color(red: 0.81, green: 0.94, blue: 1.0)
     static let textSecondary = Color(red: 0.37, green: 0.71, blue: 0.84)
-    static let border = Color(red: 0.0, green: 0.83, blue: 1.0).opacity(0.42)
+    static let border = Color(red: 0.0, green: 0.90, blue: 1.0).opacity(0.64)
     static let success = Color(red: 0.30, green: 0.90, blue: 0.70)
     static let warning = Color(red: 1.00, green: 0.76, blue: 0.32)
     static let danger = Color(red: 0.95, green: 0.38, blue: 0.40)
@@ -47,7 +47,7 @@ struct JarvisBackground: View {
                 for y in stride(from: 0, through: size.height, by: spacing) {
                     grid.move(to: CGPoint(x: 0, y: y)); grid.addLine(to: CGPoint(x: size.width, y: y))
                 }
-                context.stroke(grid, with: .color(Theme.accent.opacity(0.035)), lineWidth: 0.5)
+                context.stroke(grid, with: .color(Theme.accent.opacity(0.07)), lineWidth: 0.5)
             }
             RadialGradient(colors: [.clear, Theme.background.opacity(0.88)], center: .center, startRadius: 220, endRadius: 900)
         }
@@ -103,29 +103,30 @@ struct CommandOrb: View {
             ZStack {
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
-                        .stroke(signalColor.opacity(0.12 + Double(index) * 0.05), lineWidth: 1)
+                        .stroke(signalColor.opacity(0.24 + Double(index) * 0.08), lineWidth: 1)
                         .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2))
                 }
                 ForEach(0..<4, id: \.self) { index in
                     Circle()
                         .trim(from: 0.04, to: 0.20)
-                        .stroke(signalColor.opacity(0.8), style: StrokeStyle(lineWidth: 2, lineCap: .square))
+                        .stroke(signalColor.opacity(0.95), style: StrokeStyle(lineWidth: 2, lineCap: .square))
                         .frame(width: 230 + CGFloat(index) * 28, height: 230 + CGFloat(index) * 28)
                         .rotationEffect(.degrees(Double(index) * 91 + phase * (isActive ? 55 : 8)))
                 }
                 Circle().fill(Theme.surface).frame(width: 198, height: 198)
-                Circle().strokeBorder(signalColor.opacity(0.5), lineWidth: 1).frame(width: 188, height: 188)
-                Circle().fill(signalColor.opacity(isActive ? 0.74 : 0.42)).frame(width: 152, height: 152)
-                Circle().strokeBorder(.white.opacity(0.28), lineWidth: 1).frame(width: 116, height: 116)
+                Circle().strokeBorder(signalColor.opacity(0.9), lineWidth: 1).frame(width: 188, height: 188)
+                Circle().fill(signalColor.opacity(isActive ? 0.90 : 0.60)).frame(width: 152, height: 152)
+                Circle().strokeBorder(Theme.signalCore.opacity(0.65), lineWidth: 1).frame(width: 116, height: 116)
                 Circle().fill(Theme.background).frame(width: 88, height: 88)
                 Circle()
                     .fill(RadialGradient(colors: [Theme.signalCore, signalColor, Theme.accentDeep], center: .topLeading, startRadius: 1, endRadius: 36))
                     .frame(width: 50, height: 50)
-                    .shadow(color: signalColor.opacity(isActive ? 0.32 : 0.14), radius: isActive ? 22 : 12, y: 6)
-                Image(systemName: mode == .speaking ? "waveform" : "mic.fill")
-                    .font(.system(size: 36, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.94))
-                    .symbolEffect(.variableColor.iterative, options: .repeating, isActive: mode == .speaking && !reduceMotion)
+                    .shadow(color: signalColor.opacity(0.95), radius: isActive ? 10 : 6)
+                    .shadow(color: signalColor.opacity(0.55), radius: isActive ? 28 : 16)
+                Text("JARVIS")
+                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .tracking(1.4)
+                    .foregroundStyle(Theme.background)
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(label)

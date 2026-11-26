@@ -2,7 +2,7 @@ import SwiftUI
 
 struct VoiceView: View {
     @Environment(AppState.self) private var appState
-    @StateObject private var voiceManager = VoiceManager()
+    @EnvironmentObject private var voiceManager: VoiceManager
 
     var body: some View {
         GeometryReader { proxy in
@@ -57,9 +57,9 @@ struct VoiceView: View {
     private var voiceCore: some View {
         VStack(spacing: 0) {
             ZStack {
-                Button { Task { await toggleRecording() } } label: { CommandOrb(mode: orbMode) }
+                Button { Task { await toggleListener() } } label: { CommandOrb(mode: orbMode) }
                     .buttonStyle(.plain)
-                    .help(voiceManager.recorder.state == .recording ? "Stop recording" : "Start push-to-talk")
+                    .help(voiceManager.recorder.state == .recording ? "Pause listener" : "Resume listener")
                 radialShortcut("CHAT", at: CGSize(width: -145, height: -92)) { appState.selection = .chat }
                 radialShortcut("CENTER", at: CGSize(width: 145, height: -92)) { appState.selection = .dashboard }
                 radialShortcut("SETTINGS", at: CGSize(width: 152, height: 98)) { appState.selection = .settings }
@@ -82,8 +82,8 @@ struct VoiceView: View {
                 telemetryRow("STATUS", microphoneLabel, valueColor: microphoneColor)
                 signalBars(active: voiceManager.recorder.state == .recording)
             }
-            TelemetryPanel(title: "Prompt", symbol: "waveform.path") {
-                Text("Push to talk to create a local audio stream.")
+            TelemetryPanel(title: "Listener", symbol: "ear.and.waveform") {
+                Text("Continuous local capture is active while JARVIS is open. Audio is not saved.")
                     .font(.caption).foregroundStyle(Theme.textSecondary).fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -106,8 +106,8 @@ struct VoiceView: View {
 
     private var controlRow: some View {
         HStack(spacing: 12) {
-            Button { Task { await toggleRecording() } } label: {
-                Label(voiceManager.recorder.state == .recording ? "Stop listening" : "Speak to JARVIS", systemImage: voiceManager.recorder.state == .recording ? "stop.fill" : "mic.fill")
+            Button { Task { await toggleListener() } } label: {
+                Label(voiceManager.recorder.state == .recording ? "Pause listener" : "Resume listener", systemImage: voiceManager.recorder.state == .recording ? "pause.fill" : "play.fill")
                     .frame(minWidth: 154)
             }
             .buttonStyle(.borderedProminent).tint(Theme.accentDeep).controlSize(.large)
@@ -165,7 +165,7 @@ struct VoiceView: View {
         switch voiceManager.recorder.state { case .idle: "How can I help?"; case .recording: "I’m listening"; case .denied: "Microphone access is needed"; case .failed: "Audio is unavailable" }
     }
     private var statusDetail: String {
-        switch voiceManager.recorder.state { case .idle: "Click the core or start a voice session."; case .recording: "Listening locally — stop when you’re finished."; case .denied: "Enable microphone permission in System Settings, then try again."; case .failed(let detail): detail }
+        switch voiceManager.recorder.state { case .idle: "Listener is paused. Resume it when you’re ready."; case .recording: "Listening locally while JARVIS is open."; case .denied: "Enable microphone permission in System Settings, then try again."; case .failed(let detail): detail }
     }
     private var microphoneLabel: String {
         switch voiceManager.recorder.state { case .idle: "READY"; case .recording: "LISTENING"; case .denied: "PERMISSION NEEDED"; case .failed: "AUDIO ERROR" }
@@ -173,9 +173,9 @@ struct VoiceView: View {
     private var microphoneColor: Color {
         switch voiceManager.recorder.state { case .recording: Theme.success; case .denied, .failed: Theme.danger; case .idle: Theme.accent }
     }
-    private func toggleRecording() async {
-        if voiceManager.recorder.state == .recording { voiceManager.endPushToTalk() }
-        else { await voiceManager.beginPushToTalk() }
+    private func toggleListener() async {
+        if voiceManager.recorder.state == .recording { voiceManager.pauseListening() }
+        else { await voiceManager.startContinuousListening() }
     }
 }
 

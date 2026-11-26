@@ -16,8 +16,8 @@ struct SidebarView: View {
 
             Button { appState.selection = .voice } label: {
                 HStack(spacing: 10) {
-                    Image(systemName: "mic.fill").font(.headline)
-                    Text("Speak to JARVIS").font(.headline)
+                    Image(systemName: "ear.and.waveform").font(.headline)
+                    Text("Open listener").font(.headline)
                     Spacer()
                 }
                 .padding(.vertical, 5).padding(.horizontal, 4)
