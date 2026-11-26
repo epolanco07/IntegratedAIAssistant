@@ -41,6 +41,7 @@
         "ENABLE_USER_SELECTED_FILES": "readonly",
         "GENERATE_INFOPLIST_FILE": "YES",
         "INFOPLIST_KEY_NSMicrophoneUsageDescription": "Arthur uses the microphone for continuous local voice listening while the app is open.",
+        "INFOPLIST_KEY_NSSpeechRecognitionUsageDescription": "Arthur converts your spoken requests into text before sending them to your local assistant.",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]": "YES",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]": "YES",
         "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]": "YES",

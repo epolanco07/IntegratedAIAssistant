@@ -20,10 +20,25 @@ struct JarvisApp: App {
                 .task {
                     appState.connectionStatus = .checking
                     appState.connectionStatus = await backendLauncher.startIfNeeded()
+                    configureVoiceConversation()
                     await voiceManager.startContinuousListening()
                 }
         }
         .defaultSize(width: 1_440, height: 960)
         .windowToolbarStyle(.unified)
+    }
+
+    private func configureVoiceConversation() {
+        voiceManager.onFinalTranscript = { transcript in
+            Task { @MainActor in
+                let reply = await appState.send(transcript)
+                voiceManager.setProcessing(false)
+                if let reply {
+                    voiceManager.speak(reply.text)
+                } else {
+                    await voiceManager.startContinuousListening()
+                }
+            }
+        }
     }
 }

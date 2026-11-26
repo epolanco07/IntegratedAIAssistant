@@ -27,14 +27,20 @@ final class AppState {
 
     func selectConversation(_ id: UUID) { selectedConversationID = id; selection = .chat }
 
-    func send(_ draft: String) async {
+    @discardableResult
+    func send(_ draft: String) async -> ChatMessage? {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty, let id = selectedConversationID else { return }
+        guard !text.isEmpty, let id = selectedConversationID else { return nil }
         append(ChatMessage(role: .user, text: text), to: id)
         isSending = true; chatError = nil
         defer { isSending = false }
-        do { append(try await chatService.send(text, in: id), to: id) }
+        do {
+            let reply = try await chatService.send(text, in: id)
+            append(reply, to: id)
+            return reply
+        }
         catch { chatError = error.localizedDescription }
+        return nil
     }
 
     private func append(_ message: ChatMessage, to id: UUID) {

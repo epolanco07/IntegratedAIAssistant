@@ -94,7 +94,12 @@ struct DashboardView: View {
     }
 
     private var listenerDetail: String {
-        switch voiceManager.recorderState {
+        if voiceManager.isProcessing { return "ARTHUR IS THINKING…" }
+        if voiceManager.player.isSpeaking { return "ARTHUR IS SPEAKING" }
+        if voiceManager.recorderState == .recording, !voiceManager.transcript.isEmpty {
+            return "HEARD: \(voiceManager.transcript.uppercased())"
+        }
+        return switch voiceManager.recorderState {
         case .recording: "CONTINUOUS LISTENING // LOCAL"
         case .idle: "LISTENER PAUSED // LOCAL"
         case .denied: "MICROPHONE ACCESS REQUIRED"
