@@ -2,21 +2,22 @@
 
 ## Visual world
 
-JARVIS is a voice-first macOS command surface. A deep midnight field gives the speaking encounter quiet focus; cyan signal color communicates state rather than decorates it. Fine structural lines, low-opacity telemetry panes, and an energy-core gradient make the system feel alive without resorting to generic page gradients. Familiar native navigation and controls keep the interface immediately operable.
+JARVIS is a voice-first macOS holographic command surface. A deep midnight field carries a faint blueprint grid and vignette; electric cyan signal color makes status and structure legible. Low-opacity telemetry panes, 1px cyan framing, segmented orbital arcs, and an energy-core gradient make the system feel projected onto a dark technical surface. Familiar native navigation and controls keep the interface immediately operable.
 
 ## Signature move
 
-The voice orb is the system’s single ambient motion: concentric signal fields expand gently while listening or speaking and rest when idle. It conveys status without requiring the user to read a dashboard.
+The voice orb is the system’s central radial command menu. Segmented arcs rotate, signal fields expand gently, and the surrounding shortcuts lead to real JARVIS destinations. Input bars animate at a quiet idle cadence and accelerate while recording.
 
 ## Type and density
 
-Use native macOS typography for clarity. Large, compact titles establish hierarchy; supporting telemetry is concise and tabular where values are shown. Surface modules use generous outer spacing and restrained internal grouping.
+Use native macOS typography for clarity, with monospaced, uppercase micro-labels reserved for concrete telemetry. Large, compact titles establish hierarchy; supporting telemetry is concise and tabular where values are shown. Surface modules use a dense, disciplined rhythm.
 
 ## Color roles
 
-- `background`: deep blue-black workspace ground.
-- `surface`: blue-teal utility surfaces with high legibility.
-- `signal`: icy cyan for available / active system response and the orb core.
+- `background`: near-black navy workspace ground.
+- `surface`: mid-blue translucent utility panes.
+- `signal`: electric cyan for active system response and the orb core.
+- `amber`: a single warm accent for active navigation and degraded-state emphasis.
 - semantic amber, green, and red: warnings, connected state, and failure only.
 
 ## Interaction
