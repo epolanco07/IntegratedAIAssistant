@@ -18,6 +18,7 @@ final class VoiceManager: ObservableObject {
     private let endOfTurnSilence: Duration = .seconds(2)
     private var monitoringBargeIn = false
     private var spokenPhraseWords: [String] = []
+    private var bargeInAvailableAt = Date.distantFuture
 
     init() {
         recorder.$state
@@ -112,6 +113,9 @@ final class VoiceManager: ObservableObject {
     }
 
     private func handleBargeIn(_ text: String) {
+        // Let the reply become audible before the interruption monitor is
+        // allowed to act. This protects normal output from speaker echo.
+        guard Date.now >= bargeInAvailableAt else { return }
         let candidateWords = words(in: text)
         let echoedWordCount = matchingPrefixLength(candidateWords, spokenPhraseWords)
         let novelWords = Array(candidateWords.dropFirst(echoedWordCount))
@@ -144,6 +148,7 @@ final class VoiceManager: ObservableObject {
     private func startBargeInMonitor() {
         guard player.isSpeaking, !manuallyPaused else { return }
         monitoringBargeIn = true
+        bargeInAvailableAt = Date.now.addingTimeInterval(2)
         // This monitor is only for barge-in. It never creates a normal voice
         // turn during output unless a new user phrase is recognized.
         Task { [weak self] in

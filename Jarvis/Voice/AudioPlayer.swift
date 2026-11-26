@@ -11,14 +11,21 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVSpeechSyn
     override init() { super.init(); synthesizer.delegate = self }
 
     func speak(_ text: String) {
-        stop()
+        // Do not send a cancellation to an idle synthesizer immediately before
+        // queuing new speech; on some macOS audio routes that can cancel the
+        // new utterance as well.
+        if synthesizer.isSpeaking { stop() }
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = AudioConfiguration.preferredSpeechRate
         utterance.voice = AVSpeechSynthesisVoice(language: AudioConfiguration.preferredLocaleIdentifier)
+        isSpeaking = true
         synthesizer.speak(utterance)
     }
 
-    func stop() { synthesizer.stopSpeaking(at: .immediate); isSpeaking = false }
+    func stop() {
+        if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
+        isSpeaking = false
+    }
     func speechSynthesizer(_: AVSpeechSynthesizer, didStart _: AVSpeechUtterance) {
         isSpeaking = true
         onStarted?()
