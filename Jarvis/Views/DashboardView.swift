@@ -112,16 +112,17 @@ struct DashboardView: View {
     private var quickActions: some View {
         VStack(alignment: .leading, spacing: 10) {
             SectionTitle("Quick actions")
-            HStack(spacing: 10) {
+            VStack(spacing: 6) {
                 ForEach([("New conversation", "plus.bubble"), ("Start voice", "mic"), ("Settings", "gearshape")], id: \.0) { item in
                     Button { performQuickAction(item.0) } label: {
-                        Label(item.0, systemImage: item.1).padding(.horizontal, 6).padding(.vertical, 4)
+                        Label(item.0, systemImage: item.1).font(.caption).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 8).padding(.vertical, 6)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
+                    .buttonStyle(.plain)
+                    .background { ChamferedRectangle(cut: 4).fill(Theme.background.opacity(0.5)) }
+                    .overlay { ChamferedRectangle(cut: 4).stroke(Theme.border.opacity(0.55), lineWidth: 1) }
                 }
             }
-        }
+        }.cardStyle()
     }
 
     private func performQuickAction(_ title: String) {
