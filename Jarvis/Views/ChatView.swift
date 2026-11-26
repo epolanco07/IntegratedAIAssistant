@@ -13,7 +13,7 @@ struct ChatView: View {
                     Text("TEXT CONVERSATION · LOCAL PREVIEW").font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(Theme.warning)
                 }
                 Spacer()
-                Button { appState.selection = .voice } label: { Label("Voice", systemImage: "mic.fill") }
+                Button { appState.selection = .dashboard } label: { Label("Command Center", systemImage: "mic.fill") }
                     .buttonStyle(.bordered)
                 Button { appState.createConversation() } label: { Label("New", systemImage: "square.and.pencil") }
                     .buttonStyle(.bordered)

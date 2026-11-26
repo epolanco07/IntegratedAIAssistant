@@ -171,7 +171,7 @@ struct DashboardView: View {
     private func performQuickAction(_ title: String) {
         switch title {
         case "New conversation": appState.createConversation()
-        case "Start voice": appState.selection = .voice
+        case "Start voice": appState.selection = .dashboard
         case "Settings": appState.selection = .settings
         default: break
         }

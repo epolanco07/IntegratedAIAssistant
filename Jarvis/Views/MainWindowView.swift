@@ -13,7 +13,6 @@ struct MainWindowView: View {
                 switch appState.selection {
                 case .dashboard: DashboardView()
                 case .chat: ChatView()
-                case .voice: VoiceView()
                 case .settings: SettingsView()
                 }
             }
