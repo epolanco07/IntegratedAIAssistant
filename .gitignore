@@ -24,6 +24,7 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+backend/.agent_sessions.sqlite3
 
 ## Local Codex and Impeccable tooling
 .codex/
