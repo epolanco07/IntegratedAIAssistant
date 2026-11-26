@@ -33,6 +33,9 @@ struct JarvisApp: App {
     private func configureVoiceConversation() {
         voiceManager.onFinalTranscript = { transcript in
             Task { @MainActor in
+                // The local backend may have stopped after app launch. Verify
+                // it for each spoken turn so wake-word requests never vanish.
+                appState.connectionStatus = await backendLauncher.startIfNeeded()
                 let reply = await appState.send(transcript)
                 voiceManager.setProcessing(false)
                 if let reply {
