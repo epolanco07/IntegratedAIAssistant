@@ -61,7 +61,7 @@ struct DashboardView: View {
                 }.offset(y: 4)
             }
             Button { Task { await toggleListener() } } label: {
-                Label(listenerActionTitle, systemImage: voiceManager.recorder.state == .recording ? "pause.fill" : "play.fill")
+                Label(listenerActionTitle, systemImage: voiceManager.recorderState == .recording ? "pause.fill" : "play.fill")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .tracking(0.7)
                     .foregroundStyle(Theme.accent)
@@ -80,11 +80,11 @@ struct DashboardView: View {
 
     private var orbMode: CommandOrb.Mode {
         if voiceManager.player.isSpeaking { return .speaking }
-        return voiceManager.recorder.state == .recording ? .listening : .idle
+        return voiceManager.recorderState == .recording ? .listening : .idle
     }
 
     private var listenerDetail: String {
-        switch voiceManager.recorder.state {
+        switch voiceManager.recorderState {
         case .recording: "CONTINUOUS LISTENING // LOCAL"
         case .idle: "LISTENER PAUSED // LOCAL"
         case .denied: "MICROPHONE ACCESS REQUIRED"
@@ -93,11 +93,11 @@ struct DashboardView: View {
     }
 
     private var listenerActionTitle: String {
-        voiceManager.recorder.state == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"
+        voiceManager.recorderState == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"
     }
 
     private func toggleListener() async {
-        if voiceManager.recorder.state == .recording {
+        if voiceManager.recorderState == .recording {
             voiceManager.pauseListening()
         } else {
             await voiceManager.startContinuousListening()

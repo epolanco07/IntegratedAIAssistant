@@ -14,22 +14,6 @@ struct SidebarView: View {
             }
             .padding(16)
 
-            Button { appState.selection = .dashboard } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "ear.and.waveform").font(.headline)
-                    Text("LISTENER").font(.system(size: 10, weight: .bold, design: .monospaced)).tracking(0.8)
-                    Spacer()
-                }
-                .padding(.vertical, 5).padding(.horizontal, 4)
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(Theme.accent)
-            .padding(.horizontal, 12)
-            .padding(.bottom, 16)
-            .background { ChamferedRectangle(cut: 6).fill(Theme.accentDeep.opacity(0.42)) }
-            .overlay { ChamferedRectangle(cut: 6).stroke(Theme.border, lineWidth: 1) }
-
             VStack(spacing: 2) {
                 ForEach(SidebarItem.allCases) { item in
                     SidebarRow(title: item.title, systemImage: item.systemImage, isSelected: appState.selection == item) {
