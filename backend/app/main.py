@@ -7,7 +7,6 @@ Run from the ``backend`` directory with:
 import os
 from pathlib import Path
 
-from agents import Runner, SQLiteSession
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -17,6 +16,13 @@ from pydantic import BaseModel, Field
 # when the agent module is imported.
 BACKEND_DIRECTORY = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIRECTORY / ".env")
+
+# Accept the earlier local variable name too, while providing the exact name
+# expected by the OpenAI SDK. New installs should use OPENAI_API_KEY.
+if not os.getenv("OPENAI_API_KEY") and os.getenv("OPEN_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = os.environ["OPEN_API_KEY"]
+
+from agents import Runner, SQLiteSession  # noqa: E402
 
 from app.agents.arthur import arthur  # noqa: E402
 

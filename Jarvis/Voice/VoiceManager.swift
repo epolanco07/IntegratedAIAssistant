@@ -32,6 +32,8 @@ final class VoiceManager: ObservableObject {
     func startContinuousListening() async {
         guard recorderState != .recording else { return }
         manuallyPaused = false
+        transcript = ""
+        lastSubmittedTranscript = ""
         await recorder.start()
     }
 

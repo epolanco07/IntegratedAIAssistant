@@ -76,6 +76,13 @@ final class LocalBackendLauncher: ObservableObject {
     }
 
     private static func findBackendDirectory() -> URL? {
+        if let configuredPath = ProcessInfo.processInfo.environment["ARTHUR_BACKEND_PATH"] {
+            let configuredURL = URL(fileURLWithPath: configuredPath)
+            if FileManager.default.fileExists(atPath: configuredURL.appending(path: "app/main.py").path) {
+                return configuredURL
+            }
+        }
+
         var directory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
         for _ in 0..<6 {
@@ -84,6 +91,18 @@ final class LocalBackendLauncher: ObservableObject {
                 return candidate
             }
             directory.deleteLastPathComponent()
+        }
+
+        // In a Debug build, #filePath points into the checked-out source tree.
+        // This keeps Xcode launches working even when its working directory is
+        // not the project directory.
+        let sourceRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // Services
+            .deletingLastPathComponent() // Jarvis
+            .deletingLastPathComponent() // repository root
+        let sourceCandidate = sourceRoot.appending(path: "backend")
+        if FileManager.default.fileExists(atPath: sourceCandidate.appending(path: "app/main.py").path) {
+            return sourceCandidate
         }
         return nil
     }

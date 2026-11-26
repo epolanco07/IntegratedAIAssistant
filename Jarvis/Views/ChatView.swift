@@ -10,7 +10,7 @@ struct ChatView: View {
                 AssistantAvatar(size: 30)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(appState.selectedConversation?.title ?? "New conversation").font(.title3.weight(.semibold))
-                    Text("TEXT CONVERSATION · LOCAL PREVIEW").font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(Theme.warning)
+                    Text(chatStatusLabel).font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(chatStatusTint)
                 }
                 Spacer()
                 Button { appState.selection = .dashboard } label: { Label("Command Center", systemImage: "mic.fill") }
@@ -81,7 +81,7 @@ struct ChatView: View {
     }
 
     private var emptyState: some View {
-        ContentUnavailableView("Start a conversation", systemImage: "bubble.left.and.bubble.right", description: Text("Ask Arthur anything. This preview uses a local mock response."))
+        ContentUnavailableView("Start a conversation", systemImage: "bubble.left.and.bubble.right", description: Text("Ask Arthur anything. Messages are sent to your local Arthur agent."))
             .frame(maxWidth: .infinity, minHeight: 280)
     }
 
@@ -99,5 +99,17 @@ struct ChatView: View {
             .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             Spacer()
         }
+    }
+
+    private var chatStatusLabel: String {
+        switch appState.connectionStatus {
+        case .connected: "TEXT CONVERSATION · ARTHUR ONLINE"
+        case .checking: "TEXT CONVERSATION · CONNECTING"
+        case .disconnected, .failed: "TEXT CONVERSATION · BACKEND OFFLINE"
+        }
+    }
+
+    private var chatStatusTint: Color {
+        appState.connectionStatus == .connected ? Theme.success : Theme.warning
     }
 }

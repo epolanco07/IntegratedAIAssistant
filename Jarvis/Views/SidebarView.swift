@@ -52,15 +52,40 @@ struct SidebarView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Divider().overlay(Theme.border)
                 HStack(spacing: 7) {
-                    Circle().fill(Theme.warning).frame(width: 7, height: 7)
-                    Text("BACKEND OFFLINE").font(.system(size: 9, weight: .bold, design: .monospaced)).tracking(0.8)
+                    Circle().fill(connectionTint).frame(width: 7, height: 7)
+                    Text(connectionLabel).font(.system(size: 9, weight: .bold, design: .monospaced)).tracking(0.8)
                 }
-                .foregroundStyle(Theme.warning)
-                Text("LOCAL PREVIEW MODE").font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.7).foregroundStyle(Theme.textSecondary)
+                .foregroundStyle(connectionTint)
+                Text(connectionDetail).font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.7).foregroundStyle(Theme.textSecondary)
             }
             .padding(12)
         }
         .background(Theme.surface)
+    }
+
+    private var connectionLabel: String {
+        switch appState.connectionStatus {
+        case .connected: "ARTHUR CONNECTED"
+        case .checking: "STARTING ARTHUR"
+        case .disconnected, .failed: "BACKEND OFFLINE"
+        }
+    }
+
+    private var connectionDetail: String {
+        switch appState.connectionStatus {
+        case .connected: "LOCAL AGENT ONLINE"
+        case .checking: "STARTING LOCAL BACKEND"
+        case .disconnected: "LOCAL BACKEND NOT STARTED"
+        case .failed(let reason): reason.uppercased()
+        }
+    }
+
+    private var connectionTint: Color {
+        switch appState.connectionStatus {
+        case .connected: Theme.success
+        case .checking: Theme.accent
+        case .disconnected, .failed: Theme.warning
+        }
     }
 }
 
