@@ -11,7 +11,7 @@ struct DashboardView: View {
                 header
                 HStack(alignment: .top, spacing: 12) {
                     coreOverview.frame(width: 180)
-                    assistantCore.frame(maxWidth: .infinity, minHeight: 220)
+                    assistantCore.frame(maxWidth: .infinity, minHeight: 320)
                     activityFeed.frame(width: 230)
                 }
                 HStack(alignment: .top, spacing: 12) {
@@ -54,7 +54,7 @@ struct DashboardView: View {
     private var assistantCore: some View {
         VStack(spacing: 0) {
             ZStack {
-                CommandOrb(mode: orbMode).scaleEffect(0.62)
+                CommandOrb(mode: orbMode).scaleEffect(0.76)
                 VStack(spacing: 5) {
                     Text("ARTHUR").font(.system(size: 20, weight: .bold, design: .monospaced)).tracking(4).foregroundStyle(Theme.signalCore)
                     Text(listenerDetail).font(.system(size: 8, weight: .semibold, design: .monospaced)).tracking(0.6).foregroundStyle(Theme.textSecondary).lineLimit(1)
@@ -78,9 +78,6 @@ struct DashboardView: View {
             .overlay { ChamferedRectangle(cut: 5).stroke(Theme.border.opacity(0.75), lineWidth: 1) }
             .padding(.bottom, 12)
         }
-        .background { ChamferedRectangle(cut: 12).fill(Theme.surface.opacity(0.30)) }
-        .overlay { ChamferedRectangle(cut: 12).stroke(Theme.border, lineWidth: 1) }
-        .shadow(color: Theme.accent.opacity(0.10), radius: 12, y: 4)
     }
 
     private var orbMode: CommandOrb.Mode {
