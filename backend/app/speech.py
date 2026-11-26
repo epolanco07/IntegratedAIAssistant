@@ -106,6 +106,8 @@ def normalize_for_speech(text: str) -> str:
         "α": " alpha ", "β": " beta ", "γ": " gamma ", "δ": " delta ",
         "λ": " lambda ", "μ": " mu ", "σ": " sigma ", "φ": " phi ", "ω": " omega ",
         "=": " equals ", "+": " plus ", "−": " minus ",
+        "²": " squared ", "³": " cubed ", "⁴": " to the fourth power ",
+        "⁵": " to the fifth power ", "⁶": " to the sixth power ",
     }
     for source, spoken in replacements.items():
         clean = clean.replace(source, spoken)
