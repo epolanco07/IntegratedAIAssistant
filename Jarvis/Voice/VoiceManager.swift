@@ -25,7 +25,9 @@ final class VoiceManager: ObservableObject {
             self?.receiveTranscription(text)
         }
         player.onFinished = { [weak self] in
-            guard let self, !self.manuallyPaused else { return }
+            // While Arthur is still working, his short acknowledgement must
+            // not reopen the microphone and accidentally form a new turn.
+            guard let self, !self.manuallyPaused, !self.isProcessing else { return }
             Task { await self.startContinuousListening() }
         }
     }
