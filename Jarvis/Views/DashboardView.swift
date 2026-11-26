@@ -6,34 +6,81 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 12) {
                 header
-                systemStatus
-                quickActions
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
-                    recentConversations
-                    recentActivity
+                HStack(alignment: .top, spacing: 12) {
+                    coreOverview.frame(width: 190)
+                    assistantCore.frame(maxWidth: .infinity, minHeight: 220)
+                    activityFeed.frame(width: 240)
                 }
-                VStack(alignment: .leading, spacing: 10) {
-                    SectionTitle("Integrations", trailing: "Placeholders. Nothing is connected.")
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(IntegrationItem.samples) { IntegrationCard(item: $0) }
-                    }
+                HStack(alignment: .top, spacing: 12) {
+                    agentsPanel.frame(maxWidth: .infinity)
+                    recentActivity.frame(width: 270)
+                    quickActions.frame(width: 220)
+                }
+                HStack(alignment: .top, spacing: 12) {
+                    systemStatus.frame(width: 300)
+                    recentConversations.frame(maxWidth: .infinity)
                 }
             }
-            .padding(28)
+            .padding(18)
         }
     }
 
     private var header: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             VStack(alignment: .leading, spacing: 4) {
-                Text("Command center").font(.largeTitle.weight(.semibold))
-                Text(context.date.formatted(date: .complete, time: .standard))
-                    .font(.callout.monospacedDigit())
-                    .foregroundStyle(Theme.textSecondary)
+                HStack {
+                    Text("ARTHUR // COMMAND CENTER").font(.system(size: 16, weight: .bold, design: .monospaced))
+                    Spacer()
+                    Text(context.date.formatted(date: .abbreviated, time: .standard)).font(.system(size: 11, weight: .bold, design: .monospaced)).foregroundStyle(Theme.accent)
+                }
             }
         }
+    }
+
+    private var coreOverview: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionTitle("Core overview")
+            ForEach([("VOICE", "LOCAL"), ("MEMORY", "NONE"), ("AGENTS", "PREVIEW"), ("BACKEND", "OFFLINE")], id: \.0) { item in
+                HStack { Text(item.0).font(.caption2.monospaced()); Spacer(); Text(item.1).font(.caption2.monospaced()).foregroundStyle(item.1 == "OFFLINE" ? Theme.warning : Theme.accent) }
+                    .padding(8).background(Theme.background.opacity(0.55), in: ChamferedRectangle(cut: 4))
+            }
+        }.cardStyle()
+    }
+
+    private var assistantCore: some View {
+        ZStack {
+            CommandOrb(mode: .listening).scaleEffect(0.62)
+            VStack(spacing: 5) {
+                Text("ARTHUR").font(.system(size: 28, weight: .bold, design: .monospaced)).tracking(5).foregroundStyle(Theme.accent)
+                Text("LOCAL CORE // PREVIEW").font(.caption2.monospaced()).foregroundStyle(Theme.textSecondary)
+            }.offset(y: 4)
+        }
+        .background { ChamferedRectangle(cut: 12).fill(Theme.surface.opacity(0.52)) }
+        .overlay { ChamferedRectangle(cut: 12).stroke(Theme.border, lineWidth: 1) }
+    }
+
+    private var activityFeed: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            SectionTitle("Intelligence feed")
+            ForEach(ActivityItem.samples) { item in
+                HStack(alignment: .top, spacing: 7) { Circle().fill(Theme.accent).frame(width: 5, height: 5).padding(.top, 4); Text(item.title).font(.caption).lineLimit(1) }
+                Divider().overlay(Theme.border.opacity(0.45))
+            }
+        }.cardStyle()
+    }
+
+    private var agentsPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionTitle("Active modules")
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 7) {
+                ForEach(["VOICE BUS", "CHAT BUS", "MEMORY", "TOOLS", "ROUTING", "SYSTEM"], id: \.self) { name in
+                    HStack { Image(systemName: "circle.hexagongrid").foregroundStyle(Theme.accent); Text(name).font(.caption2.monospaced()); Spacer() }
+                        .padding(8).background(Theme.accentDeep.opacity(0.18), in: ChamferedRectangle(cut: 4))
+                }
+            }
+        }.cardStyle()
     }
 
     private var systemStatus: some View {
