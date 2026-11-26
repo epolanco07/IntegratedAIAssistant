@@ -7,6 +7,7 @@ final class AudioRecorder: ObservableObject {
     enum State: Equatable { case idle, recording, denied, failed(String) }
     @Published private(set) var state: State = .idle
     @Published private(set) var transcript = ""
+    @Published private(set) var inputLevel: Float = 0
 
     /// Called with live transcription and whether the recognizer considers the
     /// current phrase final. VoiceManager decides when a natural pause means
@@ -30,10 +31,16 @@ final class AudioRecorder: ObservableObject {
         @unknown default:
             authorized = false
         }
-        guard authorized else { state = .denied; return }
+        guard authorized else {
+            state = .failed("Microphone access was denied. Enable Arthur in Privacy & Security > Microphone.")
+            return
+        }
 
         let speechAuthorized = await Self.requestSpeechAuthorization()
-        guard speechAuthorized else { state = .denied; return }
+        guard speechAuthorized else {
+            state = .failed("Speech Recognition access was denied. Enable Arthur in Privacy & Security > Speech Recognition.")
+            return
+        }
         guard let recognizer, recognizer.isAvailable else {
             state = .failed("Speech recognition is currently unavailable.")
             return
@@ -64,8 +71,12 @@ final class AudioRecorder: ObservableObject {
 
             let input = engine.inputNode
             input.removeTap(onBus: 0)
-            input.installTap(onBus: 0, bufferSize: 1_024, format: input.outputFormat(forBus: 0)) { buffer, _ in
+            input.installTap(onBus: 0, bufferSize: 1_024, format: input.outputFormat(forBus: 0)) { [weak self] buffer, _ in
                 request.append(buffer)
+                let level = Self.normalizedLevel(in: buffer)
+                Task { @MainActor [weak self] in
+                    self?.inputLevel = level
+                }
             }
             engine.prepare()
             try engine.start()
@@ -80,7 +91,20 @@ final class AudioRecorder: ObservableObject {
         recognitionTask?.cancel()
         recognitionRequest = nil
         recognitionTask = nil
+        inputLevel = 0
         if state == .recording { state = .idle }
+    }
+
+    private nonisolated static func normalizedLevel(in buffer: AVAudioPCMBuffer) -> Float {
+        guard let samples = buffer.floatChannelData?.pointee else { return 0 }
+        let count = Int(buffer.frameLength)
+        guard count > 0 else { return 0 }
+
+        var sum: Float = 0
+        for index in 0..<count {
+            sum += samples[index] * samples[index]
+        }
+        return min(1, sqrt(sum / Float(count)) * 8)
     }
 
     private static func requestSpeechAuthorization() async -> Bool {
