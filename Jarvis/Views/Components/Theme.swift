@@ -36,21 +36,7 @@ struct ChamferedRectangle: Shape {
 
 struct JarvisBackground: View {
     var body: some View {
-        ZStack {
-            Theme.background
-            Canvas { context, size in
-                var grid = Path()
-                let spacing: CGFloat = 38
-                for x in stride(from: 0, through: size.width, by: spacing) {
-                    grid.move(to: CGPoint(x: x, y: 0)); grid.addLine(to: CGPoint(x: x, y: size.height))
-                }
-                for y in stride(from: 0, through: size.height, by: spacing) {
-                    grid.move(to: CGPoint(x: 0, y: y)); grid.addLine(to: CGPoint(x: size.width, y: y))
-                }
-                context.stroke(grid, with: .color(Theme.accent.opacity(0.12)), lineWidth: 0.5)
-            }
-            RadialGradient(colors: [.clear, Theme.background.opacity(0.88)], center: .center, startRadius: 220, endRadius: 900)
-        }
+        Theme.background
         .ignoresSafeArea()
     }
 }
