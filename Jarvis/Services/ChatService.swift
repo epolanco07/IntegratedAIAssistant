@@ -7,13 +7,75 @@ protocol ChatService: Sendable {
 enum ChatServiceError: LocalizedError {
     case emptyMessage
     case unavailable
+    case server(String)
+    case invalidResponse
 
     var errorDescription: String? {
         switch self {
         case .emptyMessage: "Enter a message before sending."
         case .unavailable: "The assistant service is unavailable."
+        case .server(let message): message
+        case .invalidResponse: "Arthur returned an unreadable response."
         }
     }
+}
+
+/// Sends chat messages to Arthur's FastAPI backend running only on this Mac.
+struct HTTPChatService: ChatService {
+    let baseURL: URL
+    let session: URLSession
+
+    init(baseURL: URL, session: URLSession = .shared) {
+        self.baseURL = baseURL
+        self.session = session
+    }
+
+    func send(_ text: String, in conversationID: UUID) async throws -> ChatMessage {
+        let message = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !message.isEmpty else { throw ChatServiceError.emptyMessage }
+
+        var request = URLRequest(url: baseURL.appending(path: "chat"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(
+            ChatRequest(message: message, conversationID: conversationID.uuidString)
+        )
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw ChatServiceError.unavailable
+        }
+
+        if !(200...299).contains(http.statusCode) {
+            if let failure = try? JSONDecoder().decode(BackendFailure.self, from: data) {
+                throw ChatServiceError.server(failure.detail)
+            }
+            throw ChatServiceError.unavailable
+        }
+
+        guard let reply = try? JSONDecoder().decode(ChatResponse.self, from: data) else {
+            throw ChatServiceError.invalidResponse
+        }
+        return ChatMessage(role: .assistant, text: reply.reply)
+    }
+}
+
+private struct ChatRequest: Encodable {
+    let message: String
+    let conversationID: String
+
+    enum CodingKeys: String, CodingKey {
+        case message
+        case conversationID = "conversation_id"
+    }
+}
+
+private struct ChatResponse: Decodable {
+    let reply: String
+}
+
+private struct BackendFailure: Decodable {
+    let detail: String
 }
 
 /// Development-only implementation. Swap this at the composition root when the backend is available.

@@ -1,0 +1,7 @@
+openai-agents>=0.26,<1
+fastapi>=0.165,<1
+uvicorn[standard]>=0.54,<1
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+python-dotenv
