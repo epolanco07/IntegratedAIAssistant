@@ -96,9 +96,6 @@ struct DashboardView: View {
     private var listenerDetail: String {
         if voiceManager.isProcessing { return "ARTHUR IS THINKING…" }
         if voiceManager.player.isSpeaking { return "ARTHUR IS SPEAKING" }
-        if voiceManager.recorderState == .recording, !voiceManager.transcript.isEmpty {
-            return "HEARD: \(voiceManager.transcript.uppercased())"
-        }
         return switch voiceManager.recorderState {
         case .recording: voiceManager.isAwaitingFollowUp ? "WAITING FOR YOUR RESPONSE" : "LISTENING FOR \"ARTHUR\""
         case .idle: "LISTENER PAUSED // LOCAL"

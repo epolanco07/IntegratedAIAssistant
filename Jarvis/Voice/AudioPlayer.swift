@@ -13,7 +13,8 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
 
     func speak(_ text: String) async {
         stop()
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let spokenText = speechText(from: text)
+        guard !spokenText.isEmpty else { return }
         isSpeaking = true
         do {
             var request = URLRequest(url: endpoint)
@@ -21,7 +22,7 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
             request.timeoutInterval = 90
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(
-                SpeechRequest(text: text, speed: kokoroSpeed)
+                SpeechRequest(text: spokenText, speed: kokoroSpeed)
             )
 
             let (audioData, response) = try await URLSession.shared.data(for: request)
@@ -68,6 +69,29 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
     private var kokoroSpeed: Double {
         let nativeRate = Double(AudioConfiguration.preferredSpeechRate)
         return min(max(0.96 + (nativeRate - AudioConfiguration.defaultSpeechRate) * 1.3, 0.72), 1.18)
+    }
+
+    /// Arthur's replies may contain Markdown intended for the chat surface.
+    /// Give Kokoro plain speech, preserving arithmetic as spoken multiplication.
+    private func speechText(from text: String) -> String {
+        let bulletPattern = "(?m)^\\s*[-*]\\s+"
+        let range = NSRange(text.startIndex..., in: text)
+        let withoutBullets: String
+        if let expression = try? NSRegularExpression(pattern: bulletPattern) {
+            withoutBullets = expression.stringByReplacingMatches(
+                in: text, range: range, withTemplate: ""
+            )
+        } else {
+            withoutBullets = text
+        }
+
+        return withoutBullets
+            .replacingOccurrences(of: "**", with: "")
+            .replacingOccurrences(of: "*", with: " times ")
+            .replacingOccurrences(of: "`", with: "")
+            .replacingOccurrences(of: "#", with: "")
+            .replacingOccurrences(of: "  ", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private enum PlaybackError: LocalizedError {
