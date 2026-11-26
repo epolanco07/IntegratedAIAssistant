@@ -88,12 +88,23 @@ def normalize_for_speech(text: str) -> str:
         "\\leq": " less than or equal to ", "\\geq": " greater than or equal to ",
         "\\neq": " not equal to ", "\\approx": " approximately ",
         "\\infty": " infinity ", "\\sum": " sum of ", "\\prod": " product of ",
+        "\\pi": " pi ", "\\theta": " theta ", "\\alpha": " alpha ",
+        "\\beta": " beta ", "\\gamma": " gamma ", "\\delta": " delta ",
+        "\\lambda": " lambda ", "\\mu": " mu ", "\\sigma": " sigma ",
+        "\\phi": " phi ", "\\omega": " omega ",
+        "\\sin": " sine ", "\\cos": " cosine ", "\\tan": " tangent ",
+        "\\sec": " secant ", "\\csc": " cosecant ", "\\cot": " cotangent ",
+        "\\arcsin": " arc sine ", "\\arccos": " arc cosine ",
+        "\\arctan": " arc tangent ", "\\ln": " natural log ",
+        "\\log": " log ", "\\exp": " e to the power of ",
         "\\left": "", "\\right": "", "\\,": " ", "\\ ": " ",
         "\\(": "", "\\)": "", "\\[": "", "\\]": "",
         "×": " times ", "÷": " divided by ", "±": " plus or minus ",
         "≤": " less than or equal to ", "≥": " greater than or equal to ",
         "≠": " not equal to ", "≈": " approximately ", "∞": " infinity ",
-        "√": " square root of ",
+        "√": " square root of ", "π": " pi ", "θ": " theta ",
+        "α": " alpha ", "β": " beta ", "γ": " gamma ", "δ": " delta ",
+        "λ": " lambda ", "μ": " mu ", "σ": " sigma ", "φ": " phi ", "ω": " omega ",
         "=": " equals ", "+": " plus ", "−": " minus ",
     }
     for source, spoken in replacements.items():
@@ -112,6 +123,13 @@ def normalize_for_speech(text: str) -> str:
     clean = clean.replace("*", " times ")
     clean = clean.replace("{", " ").replace("}", " ")
     clean = re.sub(r"\\[A-Za-z]+", "", clean)
+    functions = {
+        "arcsin": "arc sine", "arccos": "arc cosine", "arctan": "arc tangent",
+        "sin": "sine", "cos": "cosine", "tan": "tangent", "sec": "secant",
+        "csc": "cosecant", "cot": "cotangent", "ln": "natural log",
+    }
+    for symbol, spoken in functions.items():
+        clean = re.sub(rf"\b{symbol}\b", spoken, clean, flags=re.IGNORECASE)
     return re.sub(r"\s+", " ", clean).strip()
 
 
