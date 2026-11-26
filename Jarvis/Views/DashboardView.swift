@@ -83,17 +83,6 @@ struct DashboardView: View {
             .buttonStyle(.plain)
             .background { ChamferedRectangle(cut: 5).fill(Theme.accentDeep.opacity(0.28)) }
             .overlay { ChamferedRectangle(cut: 5).stroke(Theme.border.opacity(0.75), lineWidth: 1) }
-            HStack(spacing: 10) {
-                meter
-                Button("TEST SPEAKER") {
-                    voiceManager.speak("Arthur voice output is online.")
-                }
-                .buttonStyle(.plain)
-                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                .tracking(0.6)
-                .foregroundStyle(Theme.textSecondary)
-                .help("Speak a short local audio test")
-            }
             .padding(.bottom, 8)
         }
         .frame(maxHeight: .infinity, alignment: .center)
@@ -107,11 +96,8 @@ struct DashboardView: View {
     private var listenerDetail: String {
         if voiceManager.isProcessing { return "ARTHUR IS THINKING…" }
         if voiceManager.player.isSpeaking { return "ARTHUR IS SPEAKING" }
-        if voiceManager.recorderState == .recording {
-            if !voiceManager.transcript.isEmpty {
-                return "HEARD: \(voiceManager.transcript.uppercased())"
-            }
-            return voiceManager.inputLevel > 0.025 ? "MIC SIGNAL DETECTED // TRANSCRIBING" : "LISTENING FOR YOUR VOICE"
+        if voiceManager.recorderState == .recording, !voiceManager.transcript.isEmpty {
+            return "HEARD: \(voiceManager.transcript.uppercased())"
         }
         return switch voiceManager.recorderState {
         case .recording: "CONTINUOUS LISTENING // LOCAL"
@@ -121,17 +107,6 @@ struct DashboardView: View {
         }
     }
 
-    private var meter: some View {
-        HStack(spacing: 3) {
-            ForEach(0..<8, id: \.self) { index in
-                let threshold = Float(index + 1) / 8
-                Capsule()
-                    .fill(voiceManager.inputLevel >= threshold ? Theme.accent : Theme.accentDeep.opacity(0.35))
-                    .frame(width: 3, height: CGFloat(6 + index * 2))
-            }
-        }
-        .accessibilityLabel("Microphone input level")
-    }
 
     private var listenerActionTitle: String {
         voiceManager.recorderState == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"

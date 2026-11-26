@@ -6,7 +6,6 @@ final class VoiceManager: ObservableObject {
     @Published private(set) var transcript = ""
     @Published private(set) var isProcessing = false
     @Published private(set) var recorderState: AudioRecorder.State = .idle
-    @Published private(set) var inputLevel: Float = 0
     let recorder = AudioRecorder()
     let player = AudioPlayer()
     /// The app assigns this to route a finished spoken phrase to Arthur.
@@ -20,10 +19,6 @@ final class VoiceManager: ObservableObject {
         recorder.$state
             .sink { [weak self] state in self?.recorderState = state }
             .store(in: &subscriptions)
-        recorder.$inputLevel
-            .sink { [weak self] level in self?.inputLevel = level }
-            .store(in: &subscriptions)
-
         recorder.onTranscription = { [weak self] text, isFinal in
             self?.receiveTranscription(text, isFinal: isFinal)
         }
