@@ -5,6 +5,7 @@ Run from the ``backend`` directory with:
 """
 
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -35,6 +36,44 @@ app = FastAPI(
     version="0.1.0",
     description="A local API that lets the macOS app send messages to Arthur.",
 )
+
+
+def _concise_calendar_confirmation(reply: str) -> str:
+    """Enforce Arthur's one-line Calendar confirmation contract.
+
+    This catches the old checklist-shaped response if the model produces it,
+    before that text reaches the desktop app. Regular conversation is left
+    untouched.
+    """
+
+    if not re.search(r"(?:^|\n)\s*(?:to\s+confirm|\*\*title:\*\*)", reply, re.I):
+        return reply
+
+    fields: dict[str, str] = {}
+    for line in reply.splitlines():
+        clean = line.strip().lstrip("- ").replace("**", "")
+        label, separator, value = clean.partition(":")
+        if separator and label.lower() in {"title", "date", "time"}:
+            fields[label.lower()] = value.strip()
+
+    title = fields.get("title")
+    date = fields.get("date")
+    time = fields.get("time")
+    if not title:
+        return reply
+
+    # "Saturday, November 28, 2026" becomes the compact, spoken-friendly
+    # "Saturday the 28th of November". A date the user already phrased
+    # naturally is preserved rather than expanded.
+    if date:
+        match = re.fullmatch(r"([A-Za-z]+),\s*([A-Za-z]+)\s+(\d{1,2})(?:,\s*\d{4})?", date)
+        if match:
+            weekday, month, day = match.groups()
+            suffix = "th" if 10 < int(day) % 100 < 14 else {1: "st", 2: "nd", 3: "rd"}.get(int(day) % 10, "th")
+            date = f"{weekday} the {day}{suffix} of {month}"
+
+    details = " ".join(part for part in [date, time] if part)
+    return f"Add {title}{' ' + details if details else ''}?"
 
 
 class ChatRequest(BaseModel):
@@ -104,6 +143,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
             detail="Arthur could not process that request.",
         ) from error
 
-    reply = str(result.final_output)
+    reply = _concise_calendar_confirmation(str(result.final_output))
     record_conversation_message(request.conversation_id, "assistant", reply)
     return ChatResponse(reply=reply, commands=agent_context.app_commands)
