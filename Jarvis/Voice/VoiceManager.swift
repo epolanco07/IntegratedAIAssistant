@@ -172,14 +172,19 @@ final class VoiceManager: ObservableObject {
 
     private func containsWakeWord(_ text: String) -> Bool {
         let phraseWords = words(in: text)
-        guard let wakeIndex = phraseWords.firstIndex(of: "arthur"), wakeIndex <= 2 else {
+        let wakeVariants: Set<String> = ["arthur", "author"]
+        guard let wakeIndex = phraseWords.firstIndex(where: { wakeVariants.contains($0) }), wakeIndex <= 3 else {
             return false
         }
 
-        // "Arthur", "Hey Arthur", and "Okay Arthur" are direct addresses.
-        // A sentence such as "I have an assistant named Arthur" is not.
-        let allowedLeadIns: Set<String> = ["hey", "hi", "hello", "okay", "ok", "yo", "um", "uh"]
-        return phraseWords[..<wakeIndex].allSatisfy { allowedLeadIns.contains($0) }
+        // "Arthur", "Hey there Arthur", and "Okay Arthur" are direct
+        // addresses. A sentence such as "I have an assistant named Arthur"
+        // is not, because its lead-in is not a greeting/filler.
+        let leadInWords: Set<String> = [
+            "hey", "hi", "hello", "okay", "ok", "yo", "um", "uh",
+            "there", "please", "sorry",
+        ]
+        return phraseWords[..<wakeIndex].allSatisfy { leadInWords.contains($0) }
     }
 
     private func words(in text: String) -> [String] {
