@@ -7,7 +7,7 @@ Run from the ``backend`` directory with:
 import os
 from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -42,6 +42,7 @@ class ChatRequest(BaseModel):
 
     message: str = Field(min_length=1, max_length=10_000)
     conversation_id: str = Field(min_length=1, max_length=128)
+    timezone: str | None = Field(default=None, max_length=128)
 
 
 class ChatResponse(BaseModel):
@@ -75,8 +76,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
             request.conversation_id,
             BACKEND_DIRECTORY / ".agent_sessions.sqlite3",
         )
-        timezone_name = os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
-        now = datetime.now(ZoneInfo(timezone_name))
+        timezone_name = request.timezone or os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
+        try:
+            timezone = ZoneInfo(timezone_name)
+        except ZoneInfoNotFoundError:
+            timezone_name = os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
+            timezone = ZoneInfo(timezone_name)
+        now = datetime.now(timezone)
         temporal_context = (
             "SYSTEM DATE/TIME CONTEXT (authoritative; use silently): "
             f"It is {now.strftime('%A, %B %-d, %Y at %-I:%M %p %Z')}. "

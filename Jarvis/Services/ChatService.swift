@@ -39,7 +39,11 @@ struct HTTPChatService: ChatService {
         request.timeoutInterval = 45
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
-            ChatRequest(message: message, conversationID: conversationID.uuidString)
+            ChatRequest(
+                message: message,
+                conversationID: conversationID.uuidString,
+                timezone: TimeZone.current.identifier
+            )
         )
 
         let (data, response) = try await session.data(for: request)
@@ -64,10 +68,12 @@ struct HTTPChatService: ChatService {
 private struct ChatRequest: Encodable {
     let message: String
     let conversationID: String
+    let timezone: String
 
     enum CodingKeys: String, CodingKey {
         case message
         case conversationID = "conversation_id"
+        case timezone
     }
 }
 
