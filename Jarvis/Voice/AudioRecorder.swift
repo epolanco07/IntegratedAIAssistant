@@ -8,8 +8,18 @@ final class AudioRecorder: ObservableObject {
     private let engine = AVAudioEngine()
 
     func start() async {
-        let allowed = await AVCaptureDevice.requestAccess(for: .audio)
-        guard allowed else { state = .denied; return }
+        let authorized: Bool
+        switch AVCaptureDevice.authorizationStatus(for: .audio) {
+        case .authorized:
+            authorized = true
+        case .notDetermined:
+            authorized = await AVCaptureDevice.requestAccess(for: .audio)
+        case .denied, .restricted:
+            authorized = false
+        @unknown default:
+            authorized = false
+        }
+        guard authorized else { state = .denied; return }
         do {
             let input = engine.inputNode
             input.removeTap(onBus: 0)

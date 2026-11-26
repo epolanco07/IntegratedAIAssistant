@@ -8,7 +8,7 @@ enum Theme {
     static let accentDeep = Color(red: 0.02, green: 0.46, blue: 0.78)
     static let signalCore = Color(red: 0.90, green: 0.98, blue: 1.0)
     static let textPrimary = Color(red: 0.81, green: 0.94, blue: 1.0)
-    static let textSecondary = Color(red: 0.37, green: 0.71, blue: 0.84)
+    static let textSecondary = Color(red: 0.50, green: 0.82, blue: 0.96)
     static let border = Color(red: 0.22, green: 0.91, blue: 1.0).opacity(0.82)
     static let success = Color(red: 0.30, green: 0.90, blue: 0.70)
     static let warning = Color(red: 1.00, green: 0.76, blue: 0.32)

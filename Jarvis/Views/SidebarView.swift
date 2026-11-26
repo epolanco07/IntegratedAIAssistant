@@ -14,7 +14,7 @@ struct SidebarView: View {
             }
             .padding(16)
 
-            Button { appState.selection = .voice } label: {
+            Button { appState.selection = .dashboard } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "ear.and.waveform").font(.headline)
                     Text("LISTENER").font(.system(size: 10, weight: .bold, design: .monospaced)).tracking(0.8)

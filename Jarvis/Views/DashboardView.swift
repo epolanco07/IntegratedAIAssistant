@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
+    @EnvironmentObject private var voiceManager: VoiceManager
     private let columns = [GridItem(.adaptive(minimum: 260), spacing: 16)]
 
     var body: some View {
@@ -51,16 +52,56 @@ struct DashboardView: View {
     }
 
     private var assistantCore: some View {
-        ZStack {
-            CommandOrb(mode: .listening).scaleEffect(0.62)
-            VStack(spacing: 5) {
-                Text("ARTHUR").font(.system(size: 28, weight: .bold, design: .monospaced)).tracking(5).foregroundStyle(Theme.accent)
-                Text("LOCAL CORE // PREVIEW").font(.caption2.monospaced()).foregroundStyle(Theme.textSecondary)
-            }.offset(y: 4)
+        VStack(spacing: 0) {
+            ZStack {
+                CommandOrb(mode: orbMode).scaleEffect(0.62)
+                VStack(spacing: 5) {
+                    Text("ARTHUR").font(.system(size: 28, weight: .bold, design: .monospaced)).tracking(5).foregroundStyle(Theme.accent)
+                    Text(listenerDetail).font(.caption2.monospaced()).foregroundStyle(Theme.textSecondary)
+                }.offset(y: 4)
+            }
+            Button { Task { await toggleListener() } } label: {
+                Label(listenerActionTitle, systemImage: voiceManager.recorder.state == .recording ? "pause.fill" : "play.fill")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .tracking(0.7)
+                    .foregroundStyle(Theme.accent)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+            }
+            .buttonStyle(.plain)
+            .background { ChamferedRectangle(cut: 5).fill(Theme.accentDeep.opacity(0.28)) }
+            .overlay { ChamferedRectangle(cut: 5).stroke(Theme.border.opacity(0.75), lineWidth: 1) }
+            .padding(.bottom, 12)
         }
         .background { ChamferedRectangle(cut: 12).fill(Theme.surface.opacity(0.30)) }
         .overlay { ChamferedRectangle(cut: 12).stroke(Theme.border, lineWidth: 1) }
         .shadow(color: Theme.accent.opacity(0.10), radius: 12, y: 4)
+    }
+
+    private var orbMode: CommandOrb.Mode {
+        if voiceManager.player.isSpeaking { return .speaking }
+        return voiceManager.recorder.state == .recording ? .listening : .idle
+    }
+
+    private var listenerDetail: String {
+        switch voiceManager.recorder.state {
+        case .recording: "CONTINUOUS LISTENING // LOCAL"
+        case .idle: "LISTENER PAUSED // LOCAL"
+        case .denied: "MICROPHONE ACCESS REQUIRED"
+        case .failed: "AUDIO INPUT UNAVAILABLE"
+        }
+    }
+
+    private var listenerActionTitle: String {
+        voiceManager.recorder.state == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"
+    }
+
+    private func toggleListener() async {
+        if voiceManager.recorder.state == .recording {
+            voiceManager.pauseListening()
+        } else {
+            await voiceManager.startContinuousListening()
+        }
     }
 
     private var activityFeed: some View {
