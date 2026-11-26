@@ -72,8 +72,8 @@ struct DashboardView: View {
                 .font(.system(size: 9, weight: .semibold, design: .monospaced))
                 .tracking(0.8)
                 .foregroundStyle(Theme.textSecondary)
-            Button { Task { await toggleListener() } } label: {
-                Label(listenerActionTitle, systemImage: voiceManager.recorderState == .recording ? "pause.fill" : "play.fill")
+            Button { Task { await performListenerAction() } } label: {
+                Label(listenerActionTitle, systemImage: listenerActionSymbol)
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .tracking(0.7)
                     .foregroundStyle(Theme.accent)
@@ -109,10 +109,20 @@ struct DashboardView: View {
 
 
     private var listenerActionTitle: String {
-        voiceManager.recorderState == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"
+        if voiceManager.player.isSpeaking { return "CUT OFF ARTHUR" }
+        return voiceManager.recorderState == .recording ? "PAUSE LISTENER" : "RESUME LISTENER"
     }
 
-    private func toggleListener() async {
+    private var listenerActionSymbol: String {
+        if voiceManager.player.isSpeaking { return "stop.fill" }
+        return voiceManager.recorderState == .recording ? "pause.fill" : "play.fill"
+    }
+
+    private func performListenerAction() async {
+        if voiceManager.player.isSpeaking {
+            voiceManager.interrupt()
+            return
+        }
         if voiceManager.recorderState == .recording {
             voiceManager.pauseListening()
         } else {

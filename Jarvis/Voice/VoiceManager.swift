@@ -29,7 +29,9 @@ final class VoiceManager: ObservableObject {
     }
 
     func startContinuousListening() async {
-        guard recorderState != .recording else { return }
+        // Never open the microphone while Arthur is speaking. This prevents
+        // the recognizer from hearing Arthur's own synthesized response.
+        guard recorderState != .recording, !player.isSpeaking else { return }
         manuallyPaused = false
         transcript = ""
         lastSubmittedTranscript = ""
@@ -43,6 +45,8 @@ final class VoiceManager: ObservableObject {
     }
 
     func interrupt() {
+        // A deliberate interruption keeps listening paused until the user
+        // resumes it, preventing a feedback loop from trailing output audio.
         player.stop()
         pauseListening()
     }
