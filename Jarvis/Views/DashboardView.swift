@@ -56,9 +56,14 @@ struct DashboardView: View {
             ZStack {
                 CommandOrb(mode: orbMode).scaleEffect(0.62)
                 VStack(spacing: 5) {
-                    Text("ARTHUR").font(.system(size: 28, weight: .bold, design: .monospaced)).tracking(5).foregroundStyle(Theme.accent)
-                    Text(listenerDetail).font(.caption2.monospaced()).foregroundStyle(Theme.textSecondary)
-                }.offset(y: 4)
+                    Text("ARTHUR").font(.system(size: 20, weight: .bold, design: .monospaced)).tracking(4).foregroundStyle(Theme.signalCore)
+                    Text(listenerDetail).font(.system(size: 8, weight: .semibold, design: .monospaced)).tracking(0.6).foregroundStyle(Theme.textSecondary).lineLimit(1)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background { ChamferedRectangle(cut: 6).fill(Theme.background.opacity(0.92)) }
+                .overlay { ChamferedRectangle(cut: 6).stroke(Theme.border.opacity(0.82), lineWidth: 1) }
+                .offset(y: 4)
             }
             Button { Task { await toggleListener() } } label: {
                 Label(listenerActionTitle, systemImage: voiceManager.recorderState == .recording ? "pause.fill" : "play.fill")
