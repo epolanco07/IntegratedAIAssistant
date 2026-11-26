@@ -63,14 +63,10 @@ struct AssistantAvatar: View {
     var size: CGFloat = 28
 
     var body: some View {
-        ZStack {
-            Circle().fill(Theme.accentDeep)
-            Circle().strokeBorder(Theme.accent.opacity(0.75), lineWidth: 1)
-            Image(systemName: "sparkle")
-                .font(.system(size: size * 0.46, weight: .semibold))
-                .foregroundStyle(.white)
-        }
+        CommandOrb(mode: .idle)
+            .scaleEffect(size / 360)
         .frame(width: size, height: size)
+        .accessibilityHidden(true)
     }
 }
 
