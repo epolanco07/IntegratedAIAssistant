@@ -86,12 +86,12 @@ struct DashboardView: View {
     }
 
     private var systemStatus: some View {
-        HStack(spacing: 0) {
+        VStack(spacing: 8) {
             statusItem("Assistant", "Standing by", "sparkle", Theme.accent, badge: ("Local preview", .mock))
-            Divider().overlay(Theme.border).padding(.vertical, 8)
+            Divider().overlay(Theme.border.opacity(0.55))
             statusItem("Backend", "Not connected", "server.rack", Theme.warning, badge: ("Offline", .neutral))
         }
-        .padding(.vertical, 8)
+        .padding(12)
         .background { ChamferedRectangle(cut: 10).fill(Theme.surface.opacity(0.36)) }
         .overlay { ChamferedRectangle(cut: 10).stroke(Theme.border, lineWidth: 1) }
         .shadow(color: Theme.accent.opacity(0.12), radius: 10, y: 3)
@@ -99,16 +99,15 @@ struct DashboardView: View {
 
     private func statusItem(_ title: String, _ value: String, _ symbol: String, _ tint: Color,
                             badge: (String, StatusBadge.Kind)) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: symbol).foregroundStyle(tint).frame(width: 26)
+        HStack(spacing: 9) {
+            Image(systemName: symbol).foregroundStyle(tint).frame(width: 18)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title.uppercased()).font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(Theme.textSecondary)
-                Text(value).font(.headline)
+                Text(title.uppercased()).font(.caption2.weight(.medium)).tracking(0.7).foregroundStyle(Theme.textSecondary).lineLimit(1)
+                Text(value).font(.caption.weight(.semibold)).lineLimit(1)
             }
-            Spacer(minLength: 12)
+            Spacer(minLength: 4)
             StatusBadge(text: badge.0, kind: badge.1)
         }
-        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
     }
 
