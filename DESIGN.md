@@ -2,7 +2,7 @@
 
 ## Visual world
 
-JARVIS is a voice-first macOS holographic command surface. A deep midnight field carries a faint blueprint grid and vignette; electric cyan signal color makes status and structure legible. Low-opacity telemetry panes, 1px cyan framing, segmented orbital arcs, and an energy-core gradient make the system feel projected onto a dark technical surface. Familiar native navigation and controls keep the interface immediately operable.
+JARVIS is a voice-first macOS holographic command surface. A deep midnight field carries a faint blueprint grid and vignette; electric cyan signal color makes status and structure legible. Low-opacity telemetry panes, 1px cyan framing, segmented orbital arcs, and an energy-core gradient make the system feel projected onto a dark technical surface. The instrument deck is deliberately uneven: compact logs, a tall time block, and staggered signal panels read as hand-assembled widgets rather than a uniform dashboard.
 
 ## Signature move
 

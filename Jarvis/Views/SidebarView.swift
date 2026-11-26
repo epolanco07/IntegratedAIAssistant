@@ -8,8 +8,8 @@ struct SidebarView: View {
             HStack(spacing: 10) {
                 AssistantAvatar(size: 34)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("JARVIS").font(.headline).tracking(2)
-                    Text("VOICE ASSISTANT").font(.caption2.weight(.medium)).tracking(0.8).foregroundStyle(Theme.accent)
+                    Text("JARVIS").font(.system(size: 13, weight: .bold, design: .monospaced)).tracking(2)
+                    Text("VOICE BUS").font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.8).foregroundStyle(Theme.accent)
                 }
             }
             .padding(16)
@@ -17,17 +17,18 @@ struct SidebarView: View {
             Button { appState.selection = .voice } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "ear.and.waveform").font(.headline)
-                    Text("Open listener").font(.headline)
+                    Text("LISTENER").font(.system(size: 10, weight: .bold, design: .monospaced)).tracking(0.8)
                     Spacer()
                 }
                 .padding(.vertical, 5).padding(.horizontal, 4)
                 .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Theme.accentDeep)
-            .controlSize(.large)
+            .buttonStyle(.plain)
+            .foregroundStyle(Theme.accent)
             .padding(.horizontal, 12)
             .padding(.bottom, 16)
+            .background { ChamferedRectangle(cut: 6).fill(Theme.accentDeep.opacity(0.42)) }
+            .overlay { ChamferedRectangle(cut: 6).stroke(Theme.border, lineWidth: 1) }
 
             VStack(spacing: 2) {
                 ForEach(SidebarItem.allCases) { item in
@@ -89,15 +90,15 @@ private struct SidebarRow: View {
                 Image(systemName: systemImage)
                     .frame(width: 18)
                     .foregroundStyle(isSelected ? Theme.accent : Theme.textSecondary)
-                Text(title).lineLimit(1)
+                Text(title.uppercased()).font(.system(size: 10, weight: .medium, design: .monospaced)).tracking(0.5).lineLimit(1)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .contentShape(Rectangle())
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(isSelected ? Theme.accent.opacity(0.14) : (hovering ? Color.white.opacity(0.05) : .clear))
+                ChamferedRectangle(cut: 4)
+                    .fill(isSelected ? Theme.accent.opacity(0.18) : (hovering ? Theme.accent.opacity(0.07) : .clear))
             )
         }
         .buttonStyle(.plain)
