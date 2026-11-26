@@ -8,7 +8,7 @@ protocol KeychainService: Sendable {
 }
 
 struct SystemKeychainService: KeychainService {
-    private let service = "com.jarvis.personal-assistant"
+    private let service = "com.arthur.personal-assistant"
 
     func save(_ value: Data, account: String) throws {
         try delete(account: account)

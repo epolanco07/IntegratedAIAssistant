@@ -48,7 +48,7 @@ struct ChatView: View {
 
             VStack(alignment: .leading, spacing: 7) {
                 HStack(alignment: .bottom, spacing: 10) {
-                TextField("Message JARVIS…", text: $draft, axis: .vertical)
+                TextField("Message Arthur…", text: $draft, axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...8)
                     .padding(.horizontal, 14)
@@ -81,7 +81,7 @@ struct ChatView: View {
     }
 
     private var emptyState: some View {
-        ContentUnavailableView("Start a conversation", systemImage: "bubble.left.and.bubble.right", description: Text("Ask JARVIS anything. This preview uses a local mock response."))
+        ContentUnavailableView("Start a conversation", systemImage: "bubble.left.and.bubble.right", description: Text("Ask Arthur anything. This preview uses a local mock response."))
             .frame(maxWidth: .infinity, minHeight: 280)
     }
 

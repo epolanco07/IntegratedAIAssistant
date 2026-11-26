@@ -16,7 +16,7 @@
       "kind": "group",
       "name": "Products",
       "children": [
-        { "path": "<PRODUCTS>/Jarvis.app", "id": "000000000000000000000120", "type": "wrapper.application", "index": false },
+        { "path": "<PRODUCTS>/Arthur.app", "id": "000000000000000000000120", "type": "wrapper.application", "index": false },
       ],
     },
   ],
@@ -24,7 +24,7 @@
     {
       "name": "Jarvis",
       "id": "000000000000000100000000",
-      "product": "Products/Jarvis.app",
+      "product": "Products/Arthur.app",
       "product-type": "application",
       "last-swift-migration": "27.2",
       "build-phases": [
@@ -40,7 +40,7 @@
         "ENABLE_PREVIEWS": "YES",
         "ENABLE_USER_SELECTED_FILES": "readonly",
         "GENERATE_INFOPLIST_FILE": "YES",
-        "INFOPLIST_KEY_NSMicrophoneUsageDescription": "JARVIS uses the microphone for push-to-talk voice input.",
+        "INFOPLIST_KEY_NSMicrophoneUsageDescription": "Arthur uses the microphone for continuous local voice listening while the app is open.",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]": "YES",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]": "YES",
         "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]": "YES",
@@ -55,7 +55,7 @@
         "LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]": "@executable_path/../Frameworks",
         "MARKETING_VERSION": "1.0",
         "PRODUCT_BUNDLE_IDENTIFIER": "devplaceholder.$(PROJECT_UNIQUE_VALUE:identifier).$(PRODUCT_NAME:rfc1034identifier)",
-        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "PRODUCT_NAME": "Arthur",
         "REGISTER_APP_GROUPS": "YES",
         "SDKROOT": "auto",
         "STRING_CATALOG_GENERATE_SYMBOLS": "YES",

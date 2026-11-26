@@ -8,7 +8,7 @@ struct SidebarView: View {
             HStack(spacing: 10) {
                 AssistantAvatar(size: 34)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("JARVIS").font(.system(size: 13, weight: .bold, design: .monospaced)).tracking(2)
+                    Text("ARTHUR").font(.system(size: 13, weight: .bold, design: .monospaced)).tracking(2)
                     Text("VOICE BUS").font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.8).foregroundStyle(Theme.accent)
                 }
             }

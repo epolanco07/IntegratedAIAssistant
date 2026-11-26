@@ -30,7 +30,7 @@ struct VoiceView: View {
     private var commandHeader: some View {
         HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("JARVIS // VOICE").font(.system(size: 18, weight: .bold, design: .monospaced))
+                    Text("ARTHUR // VOICE").font(.system(size: 18, weight: .bold, design: .monospaced))
                     Text("CAPTURE BUS // LOCAL")
                         .font(.caption2.weight(.medium)).tracking(0.8).foregroundStyle(Theme.textSecondary)
                 }

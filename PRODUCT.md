@@ -8,11 +8,11 @@ macOS native
 
 ## Users
 
-The owner uses JARVIS as a personal assistant from a Mac, primarily through voice conversation and secondarily through focused productivity actions.
+The owner uses Arthur as a personal assistant from a Mac, primarily through voice conversation and secondarily through focused productivity actions.
 
 ## Product Purpose
 
-JARVIS provides a calm, centralized surface for conversing with an assistant while leaving space for future memory, integrations, and authorized automation.
+Arthur provides a calm, centralized surface for conversing with an assistant while leaving space for future memory, integrations, and authorized automation.
 
 ## Positioning
 
@@ -30,7 +30,7 @@ The app runs as a native macOS workspace. The user can speak to the assistant, r
 
 ## Brand Commitments
 
-JARVIS is composed, precise, helpful, and quietly futuristic. The user requested a voice-first orb as the primary experience, with inspiration drawn from the functional clarity of fictional advanced-assistant interfaces, without copying their protected UI assets or layouts.
+Arthur is composed, precise, helpful, and quietly futuristic. The user requested a voice-first orb as the primary experience, with inspiration drawn from the functional clarity of fictional advanced-assistant interfaces, without copying their protected UI assets or layouts.
 
 ## Evidence on Hand
 

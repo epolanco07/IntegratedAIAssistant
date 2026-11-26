@@ -124,7 +124,7 @@ struct CommandOrb: View {
                     .frame(width: 50, height: 50)
                     .shadow(color: signalColor.opacity(1), radius: isActive ? 12 : 8)
                     .shadow(color: signalColor.opacity(0.78), radius: isActive ? 34 : 22)
-                Text("JARVIS")
+                Text("ARTHUR")
                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                     .tracking(1.4)
                     .foregroundStyle(Theme.background)

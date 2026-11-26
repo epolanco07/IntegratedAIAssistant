@@ -2,11 +2,11 @@
 
 ## Visual world
 
-JARVIS is a voice-first macOS holographic command surface. A deep midnight field carries a faint blueprint grid and vignette; electric cyan signal color makes status and structure legible. Low-opacity telemetry panes, 1px cyan framing, segmented orbital arcs, and an energy-core gradient make the system feel projected onto a dark technical surface. The instrument deck is deliberately uneven: compact logs, a tall time block, and staggered signal panels read as hand-assembled widgets rather than a uniform dashboard.
+Arthur is a voice-first macOS holographic command surface. A deep midnight field carries a faint blueprint grid and vignette; electric cyan signal color makes status and structure legible. Low-opacity telemetry panes, 1px cyan framing, segmented orbital arcs, and an energy-core gradient make the system feel projected onto a dark technical surface. The instrument deck is deliberately uneven: compact logs, a tall time block, and staggered signal panels read as hand-assembled widgets rather than a uniform dashboard.
 
 ## Signature move
 
-The voice orb is the system’s central radial command menu. Segmented arcs rotate, signal fields expand gently, and the surrounding shortcuts lead to real JARVIS destinations. The orb is an abstract energy core rather than a microphone symbol; it brightens to signal local continuous listening while JARVIS is open.
+The voice orb is the system’s central radial command menu. Segmented arcs rotate, signal fields expand gently, and the surrounding shortcuts lead to real Arthur destinations. The orb is an abstract energy core rather than a microphone symbol; it brightens to signal local continuous listening while Arthur is open.
 
 ## Type and density
 

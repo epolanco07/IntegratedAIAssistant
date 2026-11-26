@@ -1,4 +1,4 @@
-# JARVIS Personal AI Assistant
+# Arthur Personal AI Assistant
 
 Native macOS SwiftUI frontend for a future personal assistant. The application currently provides a polished local preview with mock chat responses and native audio abstractions; no AI provider, integration, or remote browser connection is active yet.
 
