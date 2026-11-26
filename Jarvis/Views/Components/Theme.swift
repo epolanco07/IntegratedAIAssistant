@@ -46,12 +46,12 @@ private struct CardStyle: ViewModifier {
         content
             .padding(16)
             .background {
-                ChamferedRectangle(cut: 10).fill(Theme.surface.opacity(0.6))
+                ChamferedRectangle(cut: 10).fill(Theme.surface.opacity(0.36))
             }
             .overlay {
                 ChamferedRectangle(cut: 10).stroke(Theme.border, lineWidth: 1)
             }
-            .shadow(color: Theme.accent.opacity(0.16), radius: 7)
+            .shadow(color: Theme.accent.opacity(0.12), radius: 10, y: 3)
     }
 }
 

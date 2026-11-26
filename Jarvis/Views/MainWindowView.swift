@@ -6,7 +6,7 @@ struct MainWindowView: View {
     var body: some View {
         NavigationSplitView {
             SidebarView()
-                .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
+                .navigationSplitViewColumnWidth(min: 180, ideal: 190, max: 210)
         } detail: {
             ZStack {
                 JarvisBackground()
@@ -22,5 +22,5 @@ struct MainWindowView: View {
 }
 
 #Preview {
-    MainWindowView().frame(width: 1100, height: 700)
+    MainWindowView().frame(width: 1280, height: 760)
 }

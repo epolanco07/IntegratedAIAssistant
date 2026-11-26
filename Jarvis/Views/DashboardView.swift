@@ -6,24 +6,25 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 header
                 HStack(alignment: .top, spacing: 12) {
-                    coreOverview.frame(width: 190)
+                    coreOverview.frame(width: 180)
                     assistantCore.frame(maxWidth: .infinity, minHeight: 220)
-                    activityFeed.frame(width: 240)
+                    activityFeed.frame(width: 230)
                 }
                 HStack(alignment: .top, spacing: 12) {
                     agentsPanel.frame(maxWidth: .infinity)
-                    recentActivity.frame(width: 270)
-                    quickActions.frame(width: 220)
+                    recentActivity.frame(width: 260)
+                    quickActions.frame(width: 210)
                 }
                 HStack(alignment: .top, spacing: 12) {
                     systemStatus.frame(width: 300)
                     recentConversations.frame(maxWidth: .infinity)
                 }
             }
-            .padding(18)
+            .frame(minWidth: 1_040, alignment: .leading)
+            .padding(22)
         }
     }
 
@@ -57,8 +58,9 @@ struct DashboardView: View {
                 Text("LOCAL CORE // PREVIEW").font(.caption2.monospaced()).foregroundStyle(Theme.textSecondary)
             }.offset(y: 4)
         }
-        .background { ChamferedRectangle(cut: 12).fill(Theme.surface.opacity(0.52)) }
+        .background { ChamferedRectangle(cut: 12).fill(Theme.surface.opacity(0.30)) }
         .overlay { ChamferedRectangle(cut: 12).stroke(Theme.border, lineWidth: 1) }
+        .shadow(color: Theme.accent.opacity(0.10), radius: 12, y: 4)
     }
 
     private var activityFeed: some View {
@@ -90,8 +92,9 @@ struct DashboardView: View {
             statusItem("Backend", "Not connected", "server.rack", Theme.warning, badge: ("Offline", .neutral))
         }
         .padding(.vertical, 8)
-        .background(Theme.surface.opacity(0.85), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.border))
+        .background { ChamferedRectangle(cut: 10).fill(Theme.surface.opacity(0.36)) }
+        .overlay { ChamferedRectangle(cut: 10).stroke(Theme.border, lineWidth: 1) }
+        .shadow(color: Theme.accent.opacity(0.12), radius: 10, y: 3)
     }
 
     private func statusItem(_ title: String, _ value: String, _ symbol: String, _ tint: Color,
