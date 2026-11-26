@@ -1,7 +1,7 @@
 import Foundation
 
 protocol ChatService: Sendable {
-    func send(_ text: String, in conversationID: UUID) async throws -> ChatMessage
+    func send(_ text: String, in conversationID: UUID) async throws -> AssistantReply
 }
 
 enum ChatServiceError: LocalizedError {
@@ -30,7 +30,7 @@ struct HTTPChatService: ChatService {
         self.session = session
     }
 
-    func send(_ text: String, in conversationID: UUID) async throws -> ChatMessage {
+    func send(_ text: String, in conversationID: UUID) async throws -> AssistantReply {
         let message = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !message.isEmpty else { throw ChatServiceError.emptyMessage }
 
@@ -61,7 +61,10 @@ struct HTTPChatService: ChatService {
         guard let reply = try? JSONDecoder().decode(ChatResponse.self, from: data) else {
             throw ChatServiceError.invalidResponse
         }
-        return ChatMessage(role: .assistant, text: reply.reply)
+        return AssistantReply(
+            message: ChatMessage(role: .assistant, text: reply.reply),
+            commands: reply.commands
+        )
     }
 }
 
@@ -79,18 +82,32 @@ private struct ChatRequest: Encodable {
 
 private struct ChatResponse: Decodable {
     let reply: String
+    let commands: [AppControlCommand]
 }
 
 private struct BackendFailure: Decodable {
     let detail: String
 }
 
+struct AppControlCommand: Decodable, Sendable {
+    let action: String
+    let value: String
+}
+
+struct AssistantReply: Sendable {
+    let message: ChatMessage
+    let commands: [AppControlCommand]
+}
+
 /// Development-only implementation. Swap this at the composition root when the backend is available.
 struct MockChatService: ChatService {
-    func send(_ text: String, in conversationID: UUID) async throws -> ChatMessage {
+    func send(_ text: String, in conversationID: UUID) async throws -> AssistantReply {
         let message = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !message.isEmpty else { throw ChatServiceError.emptyMessage }
         try await Task.sleep(for: .milliseconds(500))
-        return ChatMessage(role: .assistant, text: "This is a local preview response to: \(message)\n\nConnect the FastAPI backend to enable assistant reasoning and authorized tools.")
+        return AssistantReply(
+            message: ChatMessage(role: .assistant, text: "This is a local preview response to: \(message)\n\nConnect the FastAPI backend to enable assistant reasoning and authorized tools."),
+            commands: []
+        )
     }
 }

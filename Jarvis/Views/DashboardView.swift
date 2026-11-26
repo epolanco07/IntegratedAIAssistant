@@ -100,7 +100,7 @@ struct DashboardView: View {
             return "HEARD: \(voiceManager.transcript.uppercased())"
         }
         return switch voiceManager.recorderState {
-        case .recording: "CONTINUOUS LISTENING // LOCAL"
+        case .recording: voiceManager.isAwaitingFollowUp ? "WAITING FOR YOUR RESPONSE" : "LISTENING FOR \"ARTHUR\""
         case .idle: "LISTENER PAUSED // LOCAL"
         case .denied: "MICROPHONE ACCESS REQUIRED"
         case .failed(let reason): "VOICE ERROR: \(reason.uppercased())"

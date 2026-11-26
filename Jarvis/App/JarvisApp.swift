@@ -36,7 +36,8 @@ struct JarvisApp: App {
                 let reply = await appState.send(transcript)
                 voiceManager.setProcessing(false)
                 if let reply {
-                    voiceManager.speak(reply.text)
+                    voiceManager.setAwaitingFollowUp(reply.text.contains("?"))
+                    await voiceManager.speak(reply.text)
                 } else {
                     await voiceManager.startContinuousListening()
                 }

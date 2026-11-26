@@ -4,6 +4,7 @@ import Combine
 @MainActor
 final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVSpeechSynthesizerDelegate {
     @Published private(set) var isSpeaking = false
+    var onStarted: (@MainActor () -> Void)?
     var onFinished: (@MainActor () -> Void)?
     private let synthesizer = AVSpeechSynthesizer()
 
@@ -18,7 +19,10 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVSpeechSyn
     }
 
     func stop() { synthesizer.stopSpeaking(at: .immediate); isSpeaking = false }
-    func speechSynthesizer(_: AVSpeechSynthesizer, didStart _: AVSpeechUtterance) { isSpeaking = true }
+    func speechSynthesizer(_: AVSpeechSynthesizer, didStart _: AVSpeechUtterance) {
+        isSpeaking = true
+        onStarted?()
+    }
     func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
         isSpeaking = false
         onFinished?()

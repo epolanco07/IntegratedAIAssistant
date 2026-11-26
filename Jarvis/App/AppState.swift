@@ -35,12 +35,25 @@ final class AppState {
         isSending = true; chatError = nil
         defer { isSending = false }
         do {
-            let reply = try await chatService.send(text, in: id)
-            append(reply, to: id)
-            return reply
+            let response = try await chatService.send(text, in: id)
+            apply(response.commands)
+            append(response.message, to: id)
+            return response.message
         }
         catch { chatError = error.localizedDescription }
         return nil
+    }
+
+    private func apply(_ commands: [AppControlCommand]) {
+        for command in commands where command.action == "set_speaking_speed" {
+            let rate: Double
+            switch command.value {
+            case "slow": rate = 0.34
+            case "fast": rate = 0.58
+            default: rate = AudioConfiguration.defaultSpeechRate
+            }
+            UserDefaults.standard.set(rate, forKey: AudioConfiguration.speechRateKey)
+        }
     }
 
     private func append(_ message: ChatMessage, to id: UUID) {

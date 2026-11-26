@@ -26,7 +26,7 @@ if not os.getenv("OPENAI_API_KEY") and os.getenv("OPEN_API_KEY"):
 
 from agents import Runner, SQLiteSession  # noqa: E402
 
-from app.agents.arthur import arthur  # noqa: E402
+from app.agents.arthur import ArthurContext, arthur  # noqa: E402
 from app.tools.memory import record_conversation_message  # noqa: E402
 
 
@@ -49,6 +49,7 @@ class ChatResponse(BaseModel):
     """Arthur's text reply returned to the macOS app."""
 
     reply: str
+    commands: list[dict[str, str]] = []
 
 
 @app.get("/health")
@@ -83,17 +84,15 @@ async def chat(request: ChatRequest) -> ChatResponse:
             timezone_name = os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
             timezone = ZoneInfo(timezone_name)
         now = datetime.now(timezone)
-        temporal_context = (
-            "SYSTEM DATE/TIME CONTEXT (authoritative; use silently): "
-            f"It is {now.strftime('%A, %B %-d, %Y at %-I:%M %p %Z')}. "
-            f"Timezone: {timezone_name}. Interpret relative dates such as "
-            "today, tomorrow, and next week from this timestamp. Do not quote "
-            "this context back to the user unless they ask.\n\n"
+        agent_context = ArthurContext(
+            current_datetime=now.strftime("%A, %B %-d, %Y at %-I:%M %p %Z"),
+            timezone=timezone_name,
         )
         record_conversation_message(request.conversation_id, "user", request.message)
         result = await Runner.run(
             arthur,
-            temporal_context + "User message: " + request.message,
+            request.message,
+            context=agent_context,
             session=session,
         )
     except Exception as error:
@@ -107,4 +106,4 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
     reply = str(result.final_output)
     record_conversation_message(request.conversation_id, "assistant", reply)
-    return ChatResponse(reply=reply)
+    return ChatResponse(reply=reply, commands=agent_context.app_commands)
