@@ -8,6 +8,9 @@ xcuserdata/
 
 ## Local configuration and generated artifacts
 .env
+.secrets/
+credentials.json
+token.json
 .env.*
 !.env.example
 DerivedData/
