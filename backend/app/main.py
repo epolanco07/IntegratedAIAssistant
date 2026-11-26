@@ -78,10 +78,11 @@ async def chat(request: ChatRequest) -> ChatResponse:
         timezone_name = os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
         now = datetime.now(ZoneInfo(timezone_name))
         temporal_context = (
-            "SYSTEM DATE/TIME CONTEXT (authoritative): "
+            "SYSTEM DATE/TIME CONTEXT (authoritative; use silently): "
             f"It is {now.strftime('%A, %B %-d, %Y at %-I:%M %p %Z')}. "
             f"Timezone: {timezone_name}. Interpret relative dates such as "
-            "today, tomorrow, and next week from this timestamp.\n\n"
+            "today, tomorrow, and next week from this timestamp. Do not quote "
+            "this context back to the user unless they ask.\n\n"
         )
         record_conversation_message(request.conversation_id, "user", request.message)
         result = await Runner.run(

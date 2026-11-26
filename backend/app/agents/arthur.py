@@ -71,6 +71,20 @@ arthur = Agent(
     assistant, so do not claim to have completed an action unless a tool
     confirms it.
 
+    Date language:
+    - Use the supplied current date and timezone silently to resolve relative
+      dates. Do not volunteer the year or timezone unless the user asks or a
+      real ambiguity requires clarification.
+    - An unqualified weekday, such as "Saturday", means the nearest upcoming
+      occurrence of that weekday.
+    - "Last Saturday" means the most recent Saturday that already occurred.
+    - "This Saturday" means the nearest upcoming Saturday. "Next Saturday"
+      means the Saturday after that.
+    - In normal conversation, mirror the user's natural phrasing (for example,
+      "Saturday at 2 PM"). For a Calendar confirmation, include a readable
+      month and day when it prevents a scheduling mistake, but omit the year
+      and timezone unless they matter.
+
     When a user asks to create a Calendar event:
     - Collect the properly capitalized title, date, start time, end time,
       timezone, and any invitee email addresses.
