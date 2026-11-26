@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct VoiceView: View {
+    @Environment(AppState.self) private var appState
     @StateObject private var voiceManager = VoiceManager()
 
     var body: some View {
@@ -27,28 +28,43 @@ struct VoiceView: View {
     }
 
     private var commandHeader: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Voice console").font(.title2.weight(.semibold))
-                Text("LOCAL AUDIO INTERFACE · BACKEND SESSION NOT CONNECTED")
-                    .font(.caption2.weight(.medium)).tracking(0.8).foregroundStyle(Theme.textSecondary)
+        VStack(spacing: 12) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Voice console").font(.title2.weight(.semibold))
+                    Text("LOCAL AUDIO INTERFACE · BACKEND SESSION NOT CONNECTED")
+                        .font(.caption2.weight(.medium)).tracking(0.8).foregroundStyle(Theme.textSecondary)
+                }
+                Spacer()
+                HStack(spacing: 7) {
+                    Circle().fill(Theme.warning).frame(width: 7, height: 7)
+                    Text("BACKEND OFFLINE").font(.caption2.weight(.semibold)).tracking(0.8)
+                }
+                .foregroundStyle(Theme.warning).padding(.horizontal, 10).padding(.vertical, 6)
+                .background(Theme.warning.opacity(0.12), in: Capsule())
             }
-            Spacer()
-            HStack(spacing: 7) {
-                Circle().fill(Theme.warning).frame(width: 7, height: 7)
-                Text("BACKEND OFFLINE").font(.caption2.weight(.semibold)).tracking(0.8)
+            HStack(spacing: 6) {
+                HUDShortcut(title: "VOICE", isActive: true) { appState.selection = .voice }
+                HUDShortcut(title: "CHAT") { appState.selection = .chat }
+                HUDShortcut(title: "CENTER") { appState.selection = .dashboard }
+                HUDShortcut(title: "SETTINGS") { appState.selection = .settings }
+                Spacer()
             }
-            .foregroundStyle(Theme.warning).padding(.horizontal, 10).padding(.vertical, 6)
-            .background(Theme.warning.opacity(0.12), in: Capsule())
         }
         .padding(.top, 28)
     }
 
     private var voiceCore: some View {
         VStack(spacing: 0) {
-            Button { Task { await toggleRecording() } } label: { CommandOrb(mode: orbMode) }
-                .buttonStyle(.plain)
-                .help(voiceManager.recorder.state == .recording ? "Stop recording" : "Start push-to-talk")
+            ZStack {
+                Button { Task { await toggleRecording() } } label: { CommandOrb(mode: orbMode) }
+                    .buttonStyle(.plain)
+                    .help(voiceManager.recorder.state == .recording ? "Stop recording" : "Start push-to-talk")
+                radialShortcut("CHAT", at: CGSize(width: -145, height: -92)) { appState.selection = .chat }
+                radialShortcut("CENTER", at: CGSize(width: 145, height: -92)) { appState.selection = .dashboard }
+                radialShortcut("SETTINGS", at: CGSize(width: 152, height: 98)) { appState.selection = .settings }
+                radialShortcut("VOICE", at: CGSize(width: -152, height: 98)) { appState.selection = .voice }
+            }
             VStack(spacing: 7) {
                 Text(statusTitle).font(.system(size: 25, weight: .semibold, design: .rounded))
                 Text(statusDetail).font(.callout).foregroundStyle(Theme.textSecondary).multilineTextAlignment(.center)
@@ -113,6 +129,18 @@ struct VoiceView: View {
         }
     }
 
+    private func radialShortcut(_ title: String, at offset: CGSize, action: @escaping () -> Void) -> some View {
+        Button { action() } label: {
+            Text(title).font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(0.8)
+                .foregroundStyle(Theme.accent)
+                .padding(.horizontal, 7).padding(.vertical, 5)
+                .background { ChamferedRectangle(cut: 4).fill(Theme.background.opacity(0.72)) }
+                .overlay { ChamferedRectangle(cut: 4).stroke(Theme.border, lineWidth: 1) }
+        }
+        .buttonStyle(.plain)
+        .offset(x: offset.width, y: offset.height)
+    }
+
     private func signalBars(active: Bool) -> some View {
         TimelineView(.animation(minimumInterval: 1.0 / 24.0)) { timeline in
             let phase = timeline.date.timeIntervalSinceReferenceDate
@@ -166,10 +194,27 @@ private struct TelemetryPanel<Content: View>: View {
             content
         }
         .padding(13)
-        .background(
-            LinearGradient(colors: [Theme.surface.opacity(0.78), Theme.accentDeep.opacity(0.24)], startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-        )
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.border))
+        .background {
+            ChamferedRectangle(cut: 8)
+                .fill(LinearGradient(colors: [Theme.surface.opacity(0.45), Theme.accentDeep.opacity(0.34)], startPoint: .topLeading, endPoint: .bottomTrailing))
+        }
+        .overlay { ChamferedRectangle(cut: 8).stroke(Theme.border, lineWidth: 1) }
+    }
+}
+
+private struct HUDShortcut: View {
+    let title: String
+    var isActive = false
+    let action: () -> Void
+
+    var body: some View {
+        Button { action() } label: {
+            Text(title).font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(0.8)
+                .foregroundStyle(isActive ? Theme.warning : Theme.accent)
+                .padding(.horizontal, 11).padding(.vertical, 6)
+                .background { ChamferedRectangle(cut: 5).fill(Theme.background.opacity(0.78)) }
+                .overlay { ChamferedRectangle(cut: 5).stroke(isActive ? Theme.warning.opacity(0.8) : Theme.border, lineWidth: 1) }
+        }
+        .buttonStyle(.plain)
     }
 }
