@@ -36,6 +36,7 @@ struct HTTPChatService: ChatService {
 
         var request = URLRequest(url: baseURL.appending(path: "chat"))
         request.httpMethod = "POST"
+        request.timeoutInterval = 45
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
             ChatRequest(message: message, conversationID: conversationID.uuidString)

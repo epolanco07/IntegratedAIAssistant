@@ -24,6 +24,15 @@ final class LocalBackendLauncher: ObservableObject {
         )
     }
 
+    deinit {
+        // The Python server belongs to this app launch. Stopping it prevents a
+        // stale server from surviving after Arthur quits and blocking port 8000
+        // on the next launch.
+        if process?.isRunning == true {
+            process?.terminate()
+        }
+    }
+
     func startIfNeeded() async -> BackendConnectionStatus {
         if await isHealthy() { return .connected }
 

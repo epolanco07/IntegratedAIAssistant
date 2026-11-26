@@ -15,7 +15,11 @@ struct HTTPBackendService: BackendService {
 
     func healthCheck() async throws {
         let endpoint = baseURL.appending(path: "health")
-        let (_, response) = try await session.data(from: endpoint)
+        var request = URLRequest(url: endpoint)
+        // Startup status must never hold up the voice listener. A short probe
+        // also detects an orphaned or hung local backend promptly.
+        request.timeoutInterval = 2
+        let (_, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
         }

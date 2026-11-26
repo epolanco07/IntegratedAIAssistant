@@ -18,10 +18,12 @@ struct JarvisApp: App {
                 .preferredColorScheme(.dark)
                 .frame(minWidth: 1_320, minHeight: 900)
                 .task {
-                    appState.connectionStatus = .checking
-                    appState.connectionStatus = await backendLauncher.startIfNeeded()
+                    // Voice can start right away; it should not wait for a
+                    // network health check or a slow agent response.
                     configureVoiceConversation()
                     await voiceManager.startContinuousListening()
+                    appState.connectionStatus = .checking
+                    appState.connectionStatus = await backendLauncher.startIfNeeded()
                 }
         }
         .defaultSize(width: 1_440, height: 960)
