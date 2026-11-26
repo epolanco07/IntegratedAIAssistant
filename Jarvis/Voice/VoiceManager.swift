@@ -16,9 +16,6 @@ final class VoiceManager: ObservableObject {
     private var manuallyPaused = false
     private var lastSubmittedTranscript = ""
     private let endOfTurnSilence: Duration = .seconds(2)
-    private var monitoringBargeIn = false
-    private var spokenPhraseWords: [String] = []
-    private var bargeInAvailableAt = Date.distantFuture
 
     init() {
         recorder.$state
@@ -29,11 +26,7 @@ final class VoiceManager: ObservableObject {
         }
         player.onFinished = { [weak self] in
             guard let self, !self.manuallyPaused else { return }
-            self.stopBargeInMonitor()
             Task { await self.startContinuousListening() }
-        }
-        player.onStarted = { [weak self] in
-            self?.startBargeInMonitor()
         }
     }
 
@@ -42,7 +35,6 @@ final class VoiceManager: ObservableObject {
         // the recognizer from hearing Arthur's own synthesized response.
         guard recorderState != .recording, !player.isSpeaking else { return }
         manuallyPaused = false
-        monitoringBargeIn = false
         transcript = ""
         lastSubmittedTranscript = ""
         await recorder.start()
@@ -50,7 +42,6 @@ final class VoiceManager: ObservableObject {
 
     func pauseListening() {
         manuallyPaused = true
-        monitoringBargeIn = false
         pauseTask?.cancel()
         recorder.stop()
     }
@@ -66,8 +57,6 @@ final class VoiceManager: ObservableObject {
         pauseTask?.cancel()
         recorder.stop()
         transcript = ""
-        monitoringBargeIn = false
-        spokenPhraseWords = words(in: text)
         player.speak(text)
     }
 
@@ -75,10 +64,6 @@ final class VoiceManager: ObservableObject {
     func setAwaitingFollowUp(_ awaiting: Bool) { isAwaitingFollowUp = awaiting }
 
     private func receiveTranscription(_ text: String) {
-        if monitoringBargeIn {
-            handleBargeIn(text)
-            return
-        }
         transcript = text
         pauseTask?.cancel()
 
@@ -110,63 +95,6 @@ final class VoiceManager: ObservableObject {
         recorder.stop()
         isProcessing = true
         onFinalTranscript?(phrase)
-    }
-
-    private func handleBargeIn(_ text: String) {
-        // Let the reply become audible before the interruption monitor is
-        // allowed to act. This protects normal output from speaker echo.
-        guard Date.now >= bargeInAvailableAt else { return }
-        let candidateWords = words(in: text)
-        let echoedWordCount = matchingPrefixLength(candidateWords, spokenPhraseWords)
-        let novelWords = Array(candidateWords.dropFirst(echoedWordCount))
-        let interruptionWords: Set<String> = ["stop", "wait", "pause", "quiet", "cancel", "enough"]
-        let isExplicitInterruption = !interruptionWords.isDisjoint(with: Set(candidateWords))
-
-        // Require either a clear interruption word or a short new phrase.
-        // This filters the microphone pickup of Arthur's own voice while still
-        // letting the user naturally take over the conversation.
-        guard isExplicitInterruption || novelWords.count >= 3 else { return }
-
-        monitoringBargeIn = false
-        pauseTask?.cancel()
-        player.stop()
-        recorder.stop()
-
-        let phrase = novelWords.joined(separator: " ")
-        guard !phrase.isEmpty else { return }
-        transcript = phrase
-        isProcessing = true
-        onFinalTranscript?(phrase)
-    }
-
-    private func stopBargeInMonitor() {
-        guard monitoringBargeIn else { return }
-        monitoringBargeIn = false
-        recorder.stop()
-    }
-
-    private func startBargeInMonitor() {
-        guard player.isSpeaking, !manuallyPaused else { return }
-        monitoringBargeIn = true
-        bargeInAvailableAt = Date.now.addingTimeInterval(2)
-        // This monitor is only for barge-in. It never creates a normal voice
-        // turn during output unless a new user phrase is recognized.
-        Task { [weak self] in
-            // Give macOS output processing a moment to settle before opening
-            // the input path for a spoken interruption.
-            try? await Task.sleep(for: .milliseconds(500))
-            guard let self, self.player.isSpeaking, self.monitoringBargeIn else { return }
-            await self.recorder.start()
-        }
-    }
-
-    private func matchingPrefixLength(_ candidate: [String], _ expected: [String]) -> Int {
-        var matchCount = 0
-        for (candidateWord, expectedWord) in zip(candidate, expected) {
-            guard candidateWord == expectedWord else { break }
-            matchCount += 1
-        }
-        return matchCount
     }
 
     private func restartWakeWordListening() {
