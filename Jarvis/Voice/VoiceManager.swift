@@ -146,7 +146,13 @@ final class VoiceManager: ObservableObject {
         monitoringBargeIn = true
         // This monitor is only for barge-in. It never creates a normal voice
         // turn during output unless a new user phrase is recognized.
-        Task { await recorder.start() }
+        Task { [weak self] in
+            // Give macOS output processing a moment to settle before opening
+            // the input path for a spoken interruption.
+            try? await Task.sleep(for: .milliseconds(500))
+            guard let self, self.player.isSpeaking, self.monitoringBargeIn else { return }
+            await self.recorder.start()
+        }
     }
 
     private func matchingPrefixLength(_ candidate: [String], _ expected: [String]) -> Int {
@@ -165,7 +171,15 @@ final class VoiceManager: ObservableObject {
     }
 
     private func containsWakeWord(_ text: String) -> Bool {
-        words(in: text).contains("arthur")
+        let phraseWords = words(in: text)
+        guard let wakeIndex = phraseWords.firstIndex(of: "arthur"), wakeIndex <= 2 else {
+            return false
+        }
+
+        // "Arthur", "Hey Arthur", and "Okay Arthur" are direct addresses.
+        // A sentence such as "I have an assistant named Arthur" is not.
+        let allowedLeadIns: Set<String> = ["hey", "hi", "hello", "okay", "ok", "yo", "um", "uh"]
+        return phraseWords[..<wakeIndex].allSatisfy { allowedLeadIns.contains($0) }
     }
 
     private func words(in text: String) -> [String] {

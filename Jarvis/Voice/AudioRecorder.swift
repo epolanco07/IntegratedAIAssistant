@@ -70,6 +70,10 @@ final class AudioRecorder: ObservableObject {
 
             let input = engine.inputNode
             input.removeTap(onBus: 0)
+            // Voice processing applies acoustic echo cancellation when the
+            // microphone can hear the Mac's speakers. That keeps Arthur's
+            // output from being mistaken for a barge-in command.
+            try? input.setVoiceProcessingEnabled(true)
             input.installTap(onBus: 0, bufferSize: 1_024, format: input.outputFormat(forBus: 0)) { buffer, _ in
                 request.append(buffer)
             }
