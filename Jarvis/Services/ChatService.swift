@@ -63,7 +63,9 @@ struct HTTPChatService: ChatService {
         }
         return AssistantReply(
             message: ChatMessage(role: .assistant, text: reply.reply),
-            commands: reply.commands
+            // Older locally running backend processes predate app-control
+            // commands. Their replies are still perfectly usable speech.
+            commands: reply.commands ?? []
         )
     }
 }
@@ -82,7 +84,7 @@ private struct ChatRequest: Encodable {
 
 private struct ChatResponse: Decodable {
     let reply: String
-    let commands: [AppControlCommand]
+    let commands: [AppControlCommand]?
 }
 
 private struct BackendFailure: Decodable {
