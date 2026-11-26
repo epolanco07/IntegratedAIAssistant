@@ -132,6 +132,25 @@ def normalize_for_speech(text: str) -> str:
     for source, spoken in replacements.items():
         clean = clean.replace(source, spoken)
 
+    # Price ranges are conversational ranges, not subtraction. Handle them
+    # before individual currency values so "$5–$6" becomes one natural phrase
+    # instead of repeating the currency for both endpoints.
+    amount = r"(\d+(?:\.\d+)?)"
+    clean = re.sub(
+        rf"\${amount}\s*[-–—]\s*\${amount}",
+        r"\1 to \2 dollars",
+        clean,
+    )
+    clean = re.sub(
+        rf"\${amount}\s+to\s+\${amount}",
+        r"\1 to \2 dollars",
+        clean,
+        flags=re.IGNORECASE,
+    )
+    clean = re.sub(r"\$(\d+(?:\.\d+)?)", r"\1 dollars", clean)
+    # In scheduling and ordinary range language, a numeric dash means "to".
+    clean = re.sub(r"(?<=\d)\s*[-–—]\s*(?=\d)", " to ", clean)
+
     clean = re.sub(r"\^\{([^{}]+)\}", r" to the power of \1 ", clean)
     clean = re.sub(r"\^\s*([A-Za-z0-9]+)", r" to the power of \1 ", clean)
     clean = re.sub(r"_\{([^{}]+)\}", r" subscript \1 ", clean)
