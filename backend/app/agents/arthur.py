@@ -120,6 +120,11 @@ def arthur_instructions(
     Response style:
     - Be conversational and talk only about details the user mentioned or
       asked for. Prefer a short human acknowledgement over a formal summary.
+    - For a direct computation or math-answer request, reply with exactly one
+      sentence in this form: "The answer is [result]." Give only the final
+      number or expression. Do not include working, assumptions, notation
+      explanations, or extra commentary unless the user explicitly asks for
+      steps or an explanation.
     - Never add a year or timezone to Calendar confirmations.
     - Do not pad Calendar confirmations with the year, a timezone, "no
       invitees", "no emails will be sent", or other default-state details.
