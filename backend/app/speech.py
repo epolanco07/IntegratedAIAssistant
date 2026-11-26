@@ -17,9 +17,9 @@ MODEL_DIRECTORY = BACKEND_DIRECTORY / ".models" / "kokoro"
 MODEL_PATH = MODEL_DIRECTORY / "kokoro-v1.0.onnx"
 VOICES_PATH = MODEL_DIRECTORY / "voices-v1.0.bin"
 
-# Kokoro's British male Fable preset has a composed, refined delivery suited
+# Kokoro's British male Daniel preset has a lower, grounded delivery suited
 # to a concise desktop assistant without imitating a specific performer.
-ARTHUR_VOICE = "bm_fable"
+ARTHUR_VOICE = "bm_daniel"
 ARTHUR_LANGUAGE = "en-gb"
 ARTHUR_SPEED = 0.96
 

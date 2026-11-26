@@ -33,9 +33,6 @@ struct JarvisApp: App {
     private func configureVoiceConversation() {
         voiceManager.onFinalTranscript = { transcript in
             Task { @MainActor in
-                // Give immediate spoken feedback while the local agent and
-                // any authorized tools are working.
-                await voiceManager.speak("On it.")
                 let reply = await appState.send(transcript)
                 voiceManager.setProcessing(false)
                 if let reply {
