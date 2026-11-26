@@ -14,13 +14,14 @@ final class VoiceManager: ObservableObject {
     private var pauseTask: Task<Void, Never>?
     private var manuallyPaused = false
     private var lastSubmittedTranscript = ""
+    private let endOfTurnSilence: Duration = .seconds(2)
 
     init() {
         recorder.$state
             .sink { [weak self] state in self?.recorderState = state }
             .store(in: &subscriptions)
-        recorder.onTranscription = { [weak self] text, isFinal in
-            self?.receiveTranscription(text, isFinal: isFinal)
+        recorder.onTranscription = { [weak self] text, _ in
+            self?.receiveTranscription(text)
         }
         player.onFinished = { [weak self] in
             guard let self, !self.manuallyPaused else { return }
@@ -59,19 +60,15 @@ final class VoiceManager: ObservableObject {
 
     func setProcessing(_ processing: Bool) { isProcessing = processing }
 
-    private func receiveTranscription(_ text: String, isFinal: Bool) {
+    private func receiveTranscription(_ text: String) {
         transcript = text
         pauseTask?.cancel()
 
-        if isFinal {
-            submitCurrentPhrase()
-            return
-        }
-
-        // Apple Speech sends partial results while the user is talking. A
-        // short quiet period marks the end of a natural spoken turn.
+        // Apple can mark partial phrases as final in the middle of a longer
+        // instruction. Wait for stable silence instead, so normal pauses do
+        // not make Arthur answer over the user.
         pauseTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(1.1))
+            try? await Task.sleep(for: self?.endOfTurnSilence ?? .seconds(2))
             guard !Task.isCancelled else { return }
             self?.submitCurrentPhrase()
         }

@@ -34,6 +34,7 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
 struct SettingsView: View {
     @State private var section: SettingsSection = .general
     @State private var backendURL = "http://127.0.0.1:8000"
+    @AppStorage(AudioConfiguration.speechRateKey) private var speechRate = AudioConfiguration.defaultSpeechRate
 
     var body: some View {
         HStack(spacing: 0) {
@@ -91,11 +92,17 @@ struct SettingsView: View {
             }
         case .voice:
             Section("Voice") {
-                row("Voice profile", "British English, masculine, calm, moderate pace.", tag: "Needs backend") {
-                    Text("Not configurable").foregroundStyle(Theme.textSecondary)
+                row("Voice profile", "British English, calm, and local to macOS.", tag: "Local") {
+                    Text("System voice").foregroundStyle(Theme.textSecondary)
                 }
-                row("Speaking speed", nil, tag: "Needs backend") {
-                    Slider(value: .constant(0.5)).frame(width: 160).disabled(true)
+                row("Speaking speed", "Applies to Arthur’s next spoken response.", tag: "Live") {
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Slider(value: $speechRate, in: 0.28...0.62, step: 0.02)
+                            .frame(width: 160)
+                        Text(speedLabel)
+                            .font(.caption2.monospaced())
+                            .foregroundStyle(Theme.textSecondary)
+                    }
                 }
                 row("Input device", nil, tag: "Placeholder") {
                     Text("System default").foregroundStyle(Theme.textSecondary)
@@ -137,6 +144,14 @@ struct SettingsView: View {
                     Text("Planned").foregroundStyle(Theme.textSecondary)
                 }
             }
+        }
+    }
+
+    private var speedLabel: String {
+        switch speechRate {
+        case ..<0.38: "SLOW"
+        case 0.54...: "FAST"
+        default: "NORMAL"
         }
     }
 
