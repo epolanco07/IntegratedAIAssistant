@@ -96,6 +96,7 @@ final class VoiceManager: ObservableObject {
         isAwaitingFollowUp = false
         recorder.stop()
         isProcessing = true
+        player.playWakeSignal()
         onFinalTranscript?(phrase)
     }
 

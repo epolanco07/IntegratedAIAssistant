@@ -9,6 +9,7 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
     var onStarted: (@MainActor () -> Void)?
     var onFinished: (@MainActor () -> Void)?
     private var player: AVAudioPlayer?
+    private var wakeSignalPlayer: AVAudioPlayer?
     private let endpoint = URL(string: "http://127.0.0.1:8000/speech")!
 
     func speak(_ text: String) async {
@@ -50,6 +51,20 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
         player?.stop()
         player = nil
         isSpeaking = false
+    }
+
+    /// A quiet, rising local chirp confirms that Arthur heard a direct call
+    /// before the agent has finished preparing its reply.
+    func playWakeSignal() {
+        do {
+            let tone = try AVAudioPlayer(data: Self.risingHumWAV())
+            tone.volume = 0.24
+            tone.prepareToPlay()
+            wakeSignalPlayer = tone
+            tone.play()
+        } catch {
+            print("Arthur wake signal failed: \(error.localizedDescription)")
+        }
     }
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully _: Bool) {
@@ -97,5 +112,46 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
     private enum PlaybackError: LocalizedError {
         case couldNotStart
         var errorDescription: String? { "Arthur could not start local audio playback." }
+    }
+
+    private static func risingHumWAV() -> Data {
+        let sampleRate = 44_100
+        let duration = 0.24
+        let sampleCount = Int(Double(sampleRate) * duration)
+        var samples = [Int16]()
+        samples.reserveCapacity(sampleCount)
+        var phase = 0.0
+
+        for index in 0..<sampleCount {
+            let progress = Double(index) / Double(sampleCount)
+            let frequency = 260.0 + (progress * 520.0)
+            phase += 2 * Double.pi * frequency / Double(sampleRate)
+            let envelope = sin(Double.pi * min(progress * 2.6, 1.0)) * (1.0 - max(0, progress - 0.72) / 0.28)
+            let waveform = (sin(phase) + 0.16 * sin(phase * 2.0)) * envelope * 0.30
+            samples.append(Int16(max(-1, min(1, waveform)) * Double(Int16.max)))
+        }
+
+        var wav = Data()
+        wav.append("RIFF".data(using: .ascii)!)
+        wav.appendLittleEndian(UInt32(36 + samples.count * MemoryLayout<Int16>.size))
+        wav.append("WAVEfmt ".data(using: .ascii)!)
+        wav.appendLittleEndian(UInt32(16))
+        wav.appendLittleEndian(UInt16(1))
+        wav.appendLittleEndian(UInt16(1))
+        wav.appendLittleEndian(UInt32(sampleRate))
+        wav.appendLittleEndian(UInt32(sampleRate * MemoryLayout<Int16>.size))
+        wav.appendLittleEndian(UInt16(MemoryLayout<Int16>.size))
+        wav.appendLittleEndian(UInt16(16))
+        wav.append("data".data(using: .ascii)!)
+        wav.appendLittleEndian(UInt32(samples.count * MemoryLayout<Int16>.size))
+        samples.withUnsafeBytes { wav.append(contentsOf: $0) }
+        return wav
+    }
+}
+
+private extension Data {
+    mutating func appendLittleEndian<T: FixedWidthInteger>(_ value: T) {
+        var littleEndianValue = value.littleEndian
+        Swift.withUnsafeBytes(of: &littleEndianValue) { append(contentsOf: $0) }
     }
 }

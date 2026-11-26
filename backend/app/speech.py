@@ -68,6 +68,16 @@ def normalize_for_speech(text: str) -> str:
     if not clean:
         return ""
 
+    # RTF occasionally arrives from copied mathematical material. Decode its
+    # Unicode escapes and discard presentation-only control words first.
+    clean = re.sub(
+        r"\\u(-?\d+)\??",
+        lambda match: chr(int(match.group(1)) if int(match.group(1)) >= 0 else int(match.group(1)) + 65_536),
+        clean,
+    )
+    clean = clean.replace("\\par", " ").replace("\\line", " ")
+    clean = re.sub(r"\\(?:rtf\d+|ansi|deff\d+|pard|plain|b|i|ul|fs\d+|f\d+|cf\d+)\b", "", clean)
+
     # Resolve innermost grouped LaTex structures first, allowing nested
     # expressions such as \\frac{1}{\\frac{2}{3}} to become intelligible.
     fraction = re.compile(r"\\(?:d?frac)\s*\{([^{}]+)\}\s*\{([^{}]+)\}")
@@ -81,6 +91,10 @@ def normalize_for_speech(text: str) -> str:
             break
         clean = updated
 
+    # A superscript circle is the standard LaTex degree marker. Resolve it
+    # before generic exponent handling so 90^\\circ is spoken as 90 degrees.
+    clean = clean.replace("^\\circ", " degrees ").replace("^{\\circ}", " degrees ")
+
     # LaTex operators and delimiters become their natural spoken equivalent.
     replacements = {
         "\\times": " times ", "\\cdot": " times ", "\\div": " divided by ",
@@ -88,6 +102,12 @@ def normalize_for_speech(text: str) -> str:
         "\\leq": " less than or equal to ", "\\geq": " greater than or equal to ",
         "\\neq": " not equal to ", "\\approx": " approximately ",
         "\\infty": " infinity ", "\\sum": " sum of ", "\\prod": " product of ",
+        "\\circ": " degrees ", "\\degree": " degrees ",
+        "\\int": " integral of ", "\\lim": " limit of ", "\\partial": " partial ",
+        "\\nabla": " del ", "\\Delta": " delta ", "\\therefore": " therefore ",
+        "\\because": " because ", "\\in": " is in ", "\\notin": " is not in ",
+        "\\subset": " is a subset of ", "\\cup": " union ", "\\cap": " intersection ",
+        "\\rightarrow": " approaches ", "\\to": " approaches ",
         "\\pi": " pi ", "\\theta": " theta ", "\\alpha": " alpha ",
         "\\beta": " beta ", "\\gamma": " gamma ", "\\delta": " delta ",
         "\\lambda": " lambda ", "\\mu": " mu ", "\\sigma": " sigma ",
@@ -102,7 +122,7 @@ def normalize_for_speech(text: str) -> str:
         "×": " times ", "÷": " divided by ", "±": " plus or minus ",
         "≤": " less than or equal to ", "≥": " greater than or equal to ",
         "≠": " not equal to ", "≈": " approximately ", "∞": " infinity ",
-        "√": " square root of ", "π": " pi ", "θ": " theta ",
+        "√": " square root of ", "°": " degrees ", "π": " pi ", "θ": " theta ",
         "α": " alpha ", "β": " beta ", "γ": " gamma ", "δ": " delta ",
         "λ": " lambda ", "μ": " mu ", "σ": " sigma ", "φ": " phi ", "ω": " omega ",
         "=": " equals ", "+": " plus ", "−": " minus ",
@@ -113,9 +133,9 @@ def normalize_for_speech(text: str) -> str:
         clean = clean.replace(source, spoken)
 
     clean = re.sub(r"\^\{([^{}]+)\}", r" to the power of \1 ", clean)
-    clean = re.sub(r"\^([A-Za-z0-9]+)", r" to the power of \1 ", clean)
+    clean = re.sub(r"\^\s*([A-Za-z0-9]+)", r" to the power of \1 ", clean)
     clean = re.sub(r"_\{([^{}]+)\}", r" subscript \1 ", clean)
-    clean = re.sub(r"_([A-Za-z0-9]+)", r" subscript \1 ", clean)
+    clean = re.sub(r"_\s*([A-Za-z0-9]+)", r" subscript \1 ", clean)
 
     # Remove Markdown and residual formatting only after mathematical asterisks
     # are converted, so `3 * 4` is still spoken correctly.
