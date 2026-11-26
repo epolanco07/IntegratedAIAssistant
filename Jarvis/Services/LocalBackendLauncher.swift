@@ -65,7 +65,7 @@ final class LocalBackendLauncher: ObservableObject {
     private func launchBackend(in backendURL: URL) throws {
         guard process?.isRunning != true else { return }
 
-        let python = backendURL.appending(path: ".venv/bin/python")
+        let python = backendURL.appending(path: ".venv-kokoro/bin/python")
         guard FileManager.default.isExecutableFile(atPath: python.path) else {
             throw LauncherError.virtualEnvironmentMissing
         }

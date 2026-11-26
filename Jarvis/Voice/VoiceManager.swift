@@ -57,7 +57,7 @@ final class VoiceManager: ObservableObject {
         pauseTask?.cancel()
         recorder.stop()
         transcript = ""
-        player.speak(text)
+        await player.speak(text)
     }
 
     func setProcessing(_ processing: Bool) { isProcessing = processing }

@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 
@@ -29,6 +30,7 @@ from agents import Runner, SQLiteSession  # noqa: E402
 
 from app.agents.arthur import ArthurContext, arthur  # noqa: E402
 from app.tools.memory import record_conversation_message  # noqa: E402
+from app.speech import synthesize_speech  # noqa: E402
 
 
 app = FastAPI(
@@ -91,11 +93,29 @@ class ChatResponse(BaseModel):
     commands: list[dict[str, str]] = []
 
 
+class SpeechRequest(BaseModel):
+    """The short reply Arthur should render with his local voice."""
+
+    text: str = Field(min_length=1, max_length=5_000)
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     """A lightweight check that the local backend is running."""
 
     return {"status": "ok"}
+
+
+@app.post("/speech")
+async def speech(request: SpeechRequest) -> Response:
+    """Generate Arthur's reply with the bundled, offline Kokoro voice."""
+
+    try:
+        wav = synthesize_speech(request.text)
+    except Exception as error:
+        print(f"Arthur local speech failed: {error}")
+        raise HTTPException(status_code=503, detail="Arthur's local voice is unavailable.") from error
+    return Response(content=wav, media_type="audio/wav")
 
 
 @app.post("/chat", response_model=ChatResponse)

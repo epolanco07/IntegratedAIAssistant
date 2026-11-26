@@ -23,7 +23,9 @@ build/
 __pycache__/
 *.py[cod]
 .venv/
+.venv-kokoro/
 venv/
+backend/.models/
 backend/.agent_sessions.sqlite3
 backend/.agent_sessions.sqlite3-*
 backend/.arthur_memory.sqlite3
