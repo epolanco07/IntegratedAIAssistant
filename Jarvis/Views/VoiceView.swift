@@ -199,6 +199,7 @@ private struct TelemetryPanel<Content: View>: View {
                 .fill(LinearGradient(colors: [Theme.surface.opacity(0.45), Theme.accentDeep.opacity(0.34)], startPoint: .topLeading, endPoint: .bottomTrailing))
         }
         .overlay { ChamferedRectangle(cut: 8).stroke(Theme.border, lineWidth: 1) }
+        .shadow(color: Theme.accent.opacity(0.20), radius: 8)
     }
 }
 

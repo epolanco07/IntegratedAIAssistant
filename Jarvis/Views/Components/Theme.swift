@@ -4,12 +4,12 @@ enum Theme {
     static let background = Color(red: 0.012, green: 0.039, blue: 0.078)
     static let surface = Color(red: 0.027, green: 0.145, blue: 0.247)
     static let surfaceRaised = Color(red: 0.039, green: 0.25, blue: 0.39)
-    static let accent = Color(red: 0.0, green: 0.90, blue: 1.0)
-    static let accentDeep = Color(red: 0.02, green: 0.38, blue: 0.65)
+    static let accent = Color(red: 0.22, green: 0.91, blue: 1.0)
+    static let accentDeep = Color(red: 0.02, green: 0.46, blue: 0.78)
     static let signalCore = Color(red: 0.90, green: 0.98, blue: 1.0)
     static let textPrimary = Color(red: 0.81, green: 0.94, blue: 1.0)
     static let textSecondary = Color(red: 0.37, green: 0.71, blue: 0.84)
-    static let border = Color(red: 0.0, green: 0.90, blue: 1.0).opacity(0.64)
+    static let border = Color(red: 0.22, green: 0.91, blue: 1.0).opacity(0.82)
     static let success = Color(red: 0.30, green: 0.90, blue: 0.70)
     static let warning = Color(red: 1.00, green: 0.76, blue: 0.32)
     static let danger = Color(red: 0.95, green: 0.38, blue: 0.40)
@@ -47,7 +47,7 @@ struct JarvisBackground: View {
                 for y in stride(from: 0, through: size.height, by: spacing) {
                     grid.move(to: CGPoint(x: 0, y: y)); grid.addLine(to: CGPoint(x: size.width, y: y))
                 }
-                context.stroke(grid, with: .color(Theme.accent.opacity(0.07)), lineWidth: 0.5)
+                context.stroke(grid, with: .color(Theme.accent.opacity(0.12)), lineWidth: 0.5)
             }
             RadialGradient(colors: [.clear, Theme.background.opacity(0.88)], center: .center, startRadius: 220, endRadius: 900)
         }
@@ -65,6 +65,7 @@ private struct CardStyle: ViewModifier {
             .overlay {
                 ChamferedRectangle(cut: 10).stroke(Theme.border, lineWidth: 1)
             }
+            .shadow(color: Theme.accent.opacity(0.16), radius: 7)
     }
 }
 
@@ -103,7 +104,7 @@ struct CommandOrb: View {
             ZStack {
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
-                        .stroke(signalColor.opacity(0.24 + Double(index) * 0.08), lineWidth: 1)
+                        .stroke(signalColor.opacity(0.42 + Double(index) * 0.10), lineWidth: 1)
                         .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2))
                 }
                 ForEach(0..<4, id: \.self) { index in
@@ -121,8 +122,8 @@ struct CommandOrb: View {
                 Circle()
                     .fill(RadialGradient(colors: [Theme.signalCore, signalColor, Theme.accentDeep], center: .topLeading, startRadius: 1, endRadius: 36))
                     .frame(width: 50, height: 50)
-                    .shadow(color: signalColor.opacity(0.95), radius: isActive ? 10 : 6)
-                    .shadow(color: signalColor.opacity(0.55), radius: isActive ? 28 : 16)
+                    .shadow(color: signalColor.opacity(1), radius: isActive ? 12 : 8)
+                    .shadow(color: signalColor.opacity(0.78), radius: isActive ? 34 : 22)
                 Text("JARVIS")
                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                     .tracking(1.4)
