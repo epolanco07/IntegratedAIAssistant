@@ -46,33 +46,9 @@ final class AudioRecorder: ObservableObject {
         }
 
         do {
-            recognitionTask?.cancel()
-            recognitionTask = nil
             transcript = ""
-
-            let request = SFSpeechAudioBufferRecognitionRequest()
-            request.shouldReportPartialResults = true
-            recognitionRequest = request
-
-            recognitionTask = recognizer.recognitionTask(with: request) { [weak self] result, error in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    if let result {
-                        let text = result.bestTranscription.formattedString
-                        self.transcript = text
-                        self.onTranscription?(text, result.isFinal)
-                    }
-                    if let error, self.state == .recording {
-                        self.state = .failed(error.localizedDescription)
-                    }
-                }
-            }
-
             let input = engine.inputNode
-            input.removeTap(onBus: 0)
-            input.installTap(onBus: 0, bufferSize: 1_024, format: input.outputFormat(forBus: 0)) { buffer, _ in
-                request.append(buffer)
-            }
+            installRecognitionTask(on: input, recognizer: recognizer)
             engine.prepare()
             try engine.start()
             state = .recording
@@ -87,6 +63,45 @@ final class AudioRecorder: ObservableObject {
         recognitionRequest = nil
         recognitionTask = nil
         if state == .recording { state = .idle }
+    }
+
+    /// Clears recognized background speech without interrupting microphone
+    /// capture. This keeps wake-word listening continuous between phrases.
+    func resetRecognition() {
+        guard state == .recording, let recognizer, recognizer.isAvailable else { return }
+        transcript = ""
+        installRecognitionTask(on: engine.inputNode, recognizer: recognizer)
+    }
+
+    private func installRecognitionTask(on input: AVAudioInputNode, recognizer: SFSpeechRecognizer) {
+        recognitionRequest?.endAudio()
+        recognitionTask?.cancel()
+
+        let request = SFSpeechAudioBufferRecognitionRequest()
+        request.shouldReportPartialResults = true
+        recognitionRequest = request
+
+        recognitionTask = recognizer.recognitionTask(with: request) { [weak self] result, error in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                // A canceled, superseded request reports an error after the
+                // next request is already active; ignore that stale callback.
+                guard self.recognitionRequest === request else { return }
+                if let result {
+                    let text = result.bestTranscription.formattedString
+                    self.transcript = text
+                    self.onTranscription?(text, result.isFinal)
+                }
+                if let error, self.state == .recording {
+                    self.state = .failed(error.localizedDescription)
+                }
+            }
+        }
+
+        input.removeTap(onBus: 0)
+        input.installTap(onBus: 0, bufferSize: 1_024, format: input.outputFormat(forBus: 0)) { buffer, _ in
+            request.append(buffer)
+        }
     }
 
     private static func requestSpeechAuthorization() async -> Bool {

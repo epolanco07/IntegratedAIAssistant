@@ -166,8 +166,8 @@ final class VoiceManager: ObservableObject {
 
     private func restartWakeWordListening() {
         transcript = ""
-        recorder.stop()
-        Task { await startContinuousListening() }
+        lastSubmittedTranscript = ""
+        recorder.resetRecognition()
     }
 
     private func containsWakeWord(_ text: String) -> Bool {
