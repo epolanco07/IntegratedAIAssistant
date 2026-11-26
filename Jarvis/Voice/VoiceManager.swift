@@ -17,7 +17,7 @@ final class VoiceManager: ObservableObject {
     private var lastSubmittedTranscript = ""
     private let endOfTurnSilence: Duration = .seconds(2)
     private var monitoringBargeIn = false
-    private var spokenWords = Set<String>()
+    private var spokenPhraseWords: [String] = []
 
     init() {
         recorder.$state
@@ -30,6 +30,9 @@ final class VoiceManager: ObservableObject {
             guard let self, !self.manuallyPaused else { return }
             self.stopBargeInMonitor()
             Task { await self.startContinuousListening() }
+        }
+        player.onStarted = { [weak self] in
+            self?.startBargeInMonitor()
         }
     }
 
@@ -62,11 +65,8 @@ final class VoiceManager: ObservableObject {
         pauseTask?.cancel()
         recorder.stop()
         transcript = ""
-        monitoringBargeIn = true
-        spokenWords = Set(words(in: text))
-        // This monitor is only for barge-in. It never creates a normal voice
-        // turn while output is playing unless it recognizes a new user phrase.
-        await recorder.start()
+        monitoringBargeIn = false
+        spokenPhraseWords = words(in: text)
         player.speak(text)
     }
 
@@ -113,7 +113,8 @@ final class VoiceManager: ObservableObject {
 
     private func handleBargeIn(_ text: String) {
         let candidateWords = words(in: text)
-        let novelWords = candidateWords.filter { !spokenWords.contains($0) }
+        let echoedWordCount = matchingPrefixLength(candidateWords, spokenPhraseWords)
+        let novelWords = Array(candidateWords.dropFirst(echoedWordCount))
         let interruptionWords: Set<String> = ["stop", "wait", "pause", "quiet", "cancel", "enough"]
         let isExplicitInterruption = !interruptionWords.isDisjoint(with: Set(candidateWords))
 
@@ -127,7 +128,7 @@ final class VoiceManager: ObservableObject {
         player.stop()
         recorder.stop()
 
-        let phrase = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let phrase = novelWords.joined(separator: " ")
         guard !phrase.isEmpty else { return }
         transcript = phrase
         isProcessing = true
@@ -138,6 +139,23 @@ final class VoiceManager: ObservableObject {
         guard monitoringBargeIn else { return }
         monitoringBargeIn = false
         recorder.stop()
+    }
+
+    private func startBargeInMonitor() {
+        guard player.isSpeaking, !manuallyPaused else { return }
+        monitoringBargeIn = true
+        // This monitor is only for barge-in. It never creates a normal voice
+        // turn during output unless a new user phrase is recognized.
+        Task { await recorder.start() }
+    }
+
+    private func matchingPrefixLength(_ candidate: [String], _ expected: [String]) -> Int {
+        var matchCount = 0
+        for (candidateWord, expectedWord) in zip(candidate, expected) {
+            guard candidateWord == expectedWord else { break }
+            matchCount += 1
+        }
+        return matchCount
     }
 
     private func restartWakeWordListening() {
