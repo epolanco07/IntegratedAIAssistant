@@ -89,31 +89,45 @@ struct CommandOrb: View {
             let phase = reduceMotion ? 0 : (sin(timeline.date.timeIntervalSinceReferenceDate * 2.2) + 1) / 2
             ZStack {
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
-                        .stroke(signalColor.opacity(0.42 + Double(index) * 0.10), lineWidth: 1)
-                        .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2))
+                    Ellipse()
+                        .stroke(signalColor.opacity(0.38 + Double(index) * 0.08), lineWidth: 1)
+                        .frame(width: 282 + CGFloat(index) * 30, height: 76 + CGFloat(index) * 18)
+                        .rotationEffect(.degrees(Double(index) * 52 + phase * (isActive ? 20 : 4)))
                 }
                 ForEach(0..<4, id: \.self) { index in
                     Circle()
-                        .trim(from: 0.04, to: 0.20)
-                        .stroke(signalColor.opacity(0.95), style: StrokeStyle(lineWidth: 2, lineCap: .square))
-                        .frame(width: 230 + CGFloat(index) * 28, height: 230 + CGFloat(index) * 28)
-                        .rotationEffect(.degrees(Double(index) * 91 + phase * (isActive ? 55 : 8)))
+                        .trim(from: 0.02, to: 0.19)
+                        .stroke(signalColor.opacity(0.9), style: StrokeStyle(lineWidth: 2, lineCap: .square))
+                        .frame(width: 246 + CGFloat(index) * 18, height: 246 + CGFloat(index) * 18)
+                        .rotationEffect(.degrees(Double(index) * 88 + phase * (isActive ? 45 : 7)))
                 }
-                Circle().fill(Theme.surface).frame(width: 198, height: 198)
-                Circle().strokeBorder(signalColor.opacity(0.9), lineWidth: 1).frame(width: 188, height: 188)
-                Circle().fill(signalColor.opacity(isActive ? 0.90 : 0.60)).frame(width: 152, height: 152)
-                Circle().strokeBorder(Theme.signalCore.opacity(0.65), lineWidth: 1).frame(width: 116, height: 116)
-                Circle().fill(Theme.background).frame(width: 88, height: 88)
-                Circle()
-                    .fill(RadialGradient(colors: [Theme.signalCore, signalColor, Theme.accentDeep], center: .topLeading, startRadius: 1, endRadius: 36))
-                    .frame(width: 50, height: 50)
-                    .shadow(color: signalColor.opacity(1), radius: isActive ? 12 : 8)
-                    .shadow(color: signalColor.opacity(0.78), radius: isActive ? 34 : 22)
-                Text("ARTHUR")
-                    .font(.system(size: 9, weight: .bold, design: .monospaced))
-                    .tracking(1.4)
-                    .foregroundStyle(Theme.background)
+                Circle().fill(Theme.background.opacity(0.92)).frame(width: 226, height: 226)
+                Circle().strokeBorder(signalColor.opacity(0.92), lineWidth: 1).frame(width: 226, height: 226)
+                ForEach(0..<4, id: \.self) { index in
+                    Ellipse()
+                        .stroke(signalColor.opacity(0.24), lineWidth: 0.7)
+                        .frame(width: 54 + CGFloat(index) * 46, height: 216)
+                }
+                ForEach(0..<5, id: \.self) { index in
+                    Ellipse()
+                        .stroke(signalColor.opacity(0.24), lineWidth: 0.7)
+                        .frame(width: 216, height: 25 + CGFloat(index) * 35)
+                }
+                Circle().strokeBorder(Theme.signalCore.opacity(0.55), lineWidth: 1).frame(width: 188, height: 188)
+                VStack(spacing: 5) {
+                    Text("ARTHUR")
+                        .font(.system(size: 25, weight: .bold, design: .monospaced))
+                        .tracking(5)
+                        .foregroundStyle(Theme.accent)
+                    Text("AI CORE")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .tracking(3)
+                        .foregroundStyle(Theme.signalCore)
+                    Text("LOCAL // ACTIVE")
+                        .font(.system(size: 7, weight: .medium, design: .monospaced))
+                        .tracking(1)
+                        .foregroundStyle(Theme.textSecondary)
+                }
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(label)

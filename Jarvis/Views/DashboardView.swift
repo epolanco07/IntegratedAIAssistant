@@ -11,7 +11,7 @@ struct DashboardView: View {
                 header
                 HStack(alignment: .top, spacing: 12) {
                     coreOverview.frame(width: 180)
-                    assistantCore.frame(maxWidth: .infinity, minHeight: 320)
+                    assistantCore.frame(maxWidth: .infinity, minHeight: 420)
                     activityFeed.frame(width: 230)
                 }
                 HStack(alignment: .top, spacing: 12) {
@@ -52,19 +52,15 @@ struct DashboardView: View {
     }
 
     private var assistantCore: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 5) {
             ZStack {
-                CommandOrb(mode: orbMode).scaleEffect(0.76)
-                VStack(spacing: 5) {
-                    Text("ARTHUR").font(.system(size: 20, weight: .bold, design: .monospaced)).tracking(4).foregroundStyle(Theme.signalCore)
-                    Text(listenerDetail).font(.system(size: 8, weight: .semibold, design: .monospaced)).tracking(0.6).foregroundStyle(Theme.textSecondary).lineLimit(1)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .background { ChamferedRectangle(cut: 6).fill(Theme.background.opacity(0.92)) }
-                .overlay { ChamferedRectangle(cut: 6).stroke(Theme.border.opacity(0.82), lineWidth: 1) }
-                .offset(y: 4)
+                CommandOrb(mode: orbMode).scaleEffect(1.04)
             }
+            .frame(height: 370)
+            Text(listenerDetail)
+                .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                .tracking(0.8)
+                .foregroundStyle(Theme.textSecondary)
             Button { Task { await toggleListener() } } label: {
                 Label(listenerActionTitle, systemImage: voiceManager.recorderState == .recording ? "pause.fill" : "play.fill")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
@@ -76,7 +72,7 @@ struct DashboardView: View {
             .buttonStyle(.plain)
             .background { ChamferedRectangle(cut: 5).fill(Theme.accentDeep.opacity(0.28)) }
             .overlay { ChamferedRectangle(cut: 5).stroke(Theme.border.opacity(0.75), lineWidth: 1) }
-            .padding(.bottom, 12)
+            .padding(.bottom, 8)
         }
     }
 
