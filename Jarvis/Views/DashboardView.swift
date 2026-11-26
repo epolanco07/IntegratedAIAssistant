@@ -6,25 +6,36 @@ struct DashboardView: View {
     private let columns = [GridItem(.adaptive(minimum: 260), spacing: 16)]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            header
-            HStack(alignment: .top, spacing: 12) {
-                coreOverview.frame(width: 180)
-                assistantCore.frame(maxWidth: .infinity, minHeight: 420)
-                activityFeed.frame(width: 230)
+        GeometryReader { proxy in
+            let usableHeight = max(760, proxy.size.height - 44)
+            let topRowHeight = max(420, usableHeight * 0.52)
+            let lowerRowsHeight = usableHeight - topRowHeight - 52
+            let middleRowHeight = max(150, lowerRowsHeight * 0.46)
+            let bottomRowHeight = max(150, lowerRowsHeight - middleRowHeight)
+
+            VStack(alignment: .leading, spacing: 14) {
+                header.frame(height: 24)
+                HStack(alignment: .top, spacing: 12) {
+                    coreOverview.frame(width: 180).frame(maxHeight: .infinity)
+                    assistantCore.frame(maxWidth: .infinity, maxHeight: .infinity)
+                    activityFeed.frame(width: 230).frame(maxHeight: .infinity)
+                }
+                .frame(height: topRowHeight)
+                HStack(alignment: .top, spacing: 12) {
+                    agentsPanel.frame(maxWidth: .infinity, maxHeight: .infinity)
+                    recentActivity.frame(width: 260).frame(maxHeight: .infinity)
+                    quickActions.frame(width: 210).frame(maxHeight: .infinity)
+                }
+                .frame(height: middleRowHeight)
+                HStack(alignment: .top, spacing: 12) {
+                    systemStatus.frame(width: 300).frame(maxHeight: .infinity)
+                    recentConversations.frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .frame(height: bottomRowHeight)
             }
-            HStack(alignment: .top, spacing: 12) {
-                agentsPanel.frame(maxWidth: .infinity)
-                recentActivity.frame(width: 260)
-                quickActions.frame(width: 210)
-            }
-            HStack(alignment: .top, spacing: 12) {
-                systemStatus.frame(width: 300)
-                recentConversations.frame(maxWidth: .infinity)
-            }
+            .frame(minWidth: 1_040, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(22)
         }
-        .frame(minWidth: 1_040, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(22)
     }
 
     private var header: some View {
@@ -46,7 +57,9 @@ struct DashboardView: View {
                 HStack { Text(item.0).font(.caption2.monospaced()); Spacer(); Text(item.1).font(.caption2.monospaced()).foregroundStyle(item.1 == "OFFLINE" ? Theme.warning : Theme.accent) }
                     .padding(8).background(Theme.background.opacity(0.55), in: ChamferedRectangle(cut: 4))
             }
-        }.cardStyle()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .cardStyle()
     }
 
     private var assistantCore: some View {
@@ -72,6 +85,7 @@ struct DashboardView: View {
             .overlay { ChamferedRectangle(cut: 5).stroke(Theme.border.opacity(0.75), lineWidth: 1) }
             .padding(.bottom, 8)
         }
+        .frame(maxHeight: .infinity, alignment: .center)
     }
 
     private var orbMode: CommandOrb.Mode {
@@ -107,7 +121,9 @@ struct DashboardView: View {
                 HStack(alignment: .top, spacing: 7) { Circle().fill(Theme.accent).frame(width: 5, height: 5).padding(.top, 4); Text(item.title).font(.caption).lineLimit(1) }
                 Divider().overlay(Theme.border.opacity(0.45))
             }
-        }.cardStyle()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .cardStyle()
     }
 
     private var agentsPanel: some View {
@@ -119,7 +135,9 @@ struct DashboardView: View {
                         .padding(8).background(Theme.accentDeep.opacity(0.18), in: ChamferedRectangle(cut: 4))
                 }
             }
-        }.cardStyle()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .cardStyle()
     }
 
     private var systemStatus: some View {
@@ -128,6 +146,7 @@ struct DashboardView: View {
             Divider().overlay(Theme.border.opacity(0.55))
             statusItem("Backend", "Not connected", "server.rack", Theme.warning, badge: ("Offline", .neutral))
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(12)
         .background { ChamferedRectangle(cut: 10).fill(Theme.surface.opacity(0.36)) }
         .overlay { ChamferedRectangle(cut: 10).stroke(Theme.border, lineWidth: 1) }
@@ -161,7 +180,9 @@ struct DashboardView: View {
                     .overlay { ChamferedRectangle(cut: 4).stroke(Theme.border.opacity(0.55), lineWidth: 1) }
                 }
             }
-        }.cardStyle()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .cardStyle()
     }
 
     private func performQuickAction(_ title: String) {
@@ -183,7 +204,7 @@ struct DashboardView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .cardStyle()
     }
 
@@ -202,7 +223,7 @@ struct DashboardView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .cardStyle()
     }
 }
