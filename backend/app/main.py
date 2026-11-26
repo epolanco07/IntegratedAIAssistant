@@ -5,7 +5,9 @@ Run from the ``backend`` directory with:
 """
 
 import os
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -25,6 +27,7 @@ if not os.getenv("OPENAI_API_KEY") and os.getenv("OPEN_API_KEY"):
 from agents import Runner, SQLiteSession  # noqa: E402
 
 from app.agents.arthur import arthur  # noqa: E402
+from app.tools.memory import record_conversation_message  # noqa: E402
 
 
 app = FastAPI(
@@ -72,7 +75,20 @@ async def chat(request: ChatRequest) -> ChatResponse:
             request.conversation_id,
             BACKEND_DIRECTORY / ".agent_sessions.sqlite3",
         )
-        result = await Runner.run(arthur, request.message, session=session)
+        timezone_name = os.getenv("ARTHUR_TIMEZONE", "America/Chicago")
+        now = datetime.now(ZoneInfo(timezone_name))
+        temporal_context = (
+            "SYSTEM DATE/TIME CONTEXT (authoritative): "
+            f"It is {now.strftime('%A, %B %-d, %Y at %-I:%M %p %Z')}. "
+            f"Timezone: {timezone_name}. Interpret relative dates such as "
+            "today, tomorrow, and next week from this timestamp.\n\n"
+        )
+        record_conversation_message(request.conversation_id, "user", request.message)
+        result = await Runner.run(
+            arthur,
+            temporal_context + "User message: " + request.message,
+            session=session,
+        )
     except Exception as error:
         # Keep provider details out of the response while leaving them in the
         # terminal log for local debugging.
@@ -82,4 +98,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
             detail="Arthur could not process that request.",
         ) from error
 
-    return ChatResponse(reply=str(result.final_output))
+    reply = str(result.final_output)
+    record_conversation_message(request.conversation_id, "assistant", reply)
+    return ChatResponse(reply=reply)

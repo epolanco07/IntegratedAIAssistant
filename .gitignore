@@ -26,6 +26,8 @@ __pycache__/
 venv/
 backend/.agent_sessions.sqlite3
 backend/.agent_sessions.sqlite3-*
+backend/.arthur_memory.sqlite3
+backend/.arthur_memory.sqlite3-*
 
 ## Local Codex and Impeccable tooling
 .codex/
