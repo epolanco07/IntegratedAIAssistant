@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from io import BytesIO
+import json
 from pathlib import Path
+import re
 from threading import Lock
 from urllib.request import urlretrieve
 import wave
@@ -35,7 +37,7 @@ _engine_lock = Lock()
 def synthesize_speech(text: str, speed: float = ARTHUR_SPEED) -> bytes:
     """Return local Kokoro speech as a standard WAV payload."""
 
-    clean_text = text.strip()
+    clean_text = normalize_for_speech(text)
     if not clean_text:
         raise ValueError("Speech text cannot be empty.")
 
@@ -57,6 +59,75 @@ def synthesize_speech(text: str, speed: float = ARTHUR_SPEED) -> bytes:
         wav_file.setframerate(sample_rate)
         wav_file.writeframes(pcm)
     return output.getvalue()
+
+
+def normalize_for_speech(text: str) -> str:
+    """Turn chat formatting and common mathematical notation into plain speech."""
+
+    clean = _extract_reply_text(text).strip()
+    if not clean:
+        return ""
+
+    # Resolve innermost grouped LaTex structures first, allowing nested
+    # expressions such as \\frac{1}{\\frac{2}{3}} to become intelligible.
+    fraction = re.compile(r"\\(?:d?frac)\s*\{([^{}]+)\}\s*\{([^{}]+)\}")
+    square_root = re.compile(r"\\sqrt\s*\{([^{}]+)\}")
+    text_group = re.compile(r"\\(?:text|mathrm|mathbf|operatorname)\s*\{([^{}]+)\}")
+    while True:
+        updated = fraction.sub(lambda match: f" {match.group(1)} over {match.group(2)} ", clean)
+        updated = square_root.sub(lambda match: f" square root of {match.group(1)} ", updated)
+        updated = text_group.sub(lambda match: f" {match.group(1)} ", updated)
+        if updated == clean:
+            break
+        clean = updated
+
+    # LaTex operators and delimiters become their natural spoken equivalent.
+    replacements = {
+        "\\times": " times ", "\\cdot": " times ", "\\div": " divided by ",
+        "\\pm": " plus or minus ", "\\mp": " minus or plus ",
+        "\\leq": " less than or equal to ", "\\geq": " greater than or equal to ",
+        "\\neq": " not equal to ", "\\approx": " approximately ",
+        "\\infty": " infinity ", "\\sum": " sum of ", "\\prod": " product of ",
+        "\\left": "", "\\right": "", "\\,": " ", "\\ ": " ",
+        "\\(": "", "\\)": "", "\\[": "", "\\]": "",
+        "×": " times ", "÷": " divided by ", "±": " plus or minus ",
+        "≤": " less than or equal to ", "≥": " greater than or equal to ",
+        "≠": " not equal to ", "≈": " approximately ", "∞": " infinity ",
+        "√": " square root of ",
+        "=": " equals ", "+": " plus ", "−": " minus ",
+    }
+    for source, spoken in replacements.items():
+        clean = clean.replace(source, spoken)
+
+    clean = re.sub(r"\^\{([^{}]+)\}", r" to the power of \1 ", clean)
+    clean = re.sub(r"\^([A-Za-z0-9]+)", r" to the power of \1 ", clean)
+    clean = re.sub(r"_\{([^{}]+)\}", r" subscript \1 ", clean)
+    clean = re.sub(r"_([A-Za-z0-9]+)", r" subscript \1 ", clean)
+
+    # Remove Markdown and residual formatting only after mathematical asterisks
+    # are converted, so `3 * 4` is still spoken correctly.
+    clean = re.sub(r"```[A-Za-z]*", "", clean)
+    clean = clean.replace("**", "").replace("`", "")
+    clean = re.sub(r"(?m)^\s*[-*]\s+", "", clean)
+    clean = clean.replace("*", " times ")
+    clean = clean.replace("{", " ").replace("}", " ")
+    clean = re.sub(r"\\[A-Za-z]+", "", clean)
+    return re.sub(r"\s+", " ", clean).strip()
+
+
+def _extract_reply_text(text: str) -> str:
+    """Use the actual reply field if a provider ever sends a JSON wrapper."""
+
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return text
+    if isinstance(payload, dict):
+        for key in ("reply", "message", "content", "text"):
+            value = payload.get(key)
+            if isinstance(value, str):
+                return value
+    return text
 
 
 def _get_engine() -> Kokoro:
