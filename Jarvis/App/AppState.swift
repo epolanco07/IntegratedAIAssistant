@@ -4,7 +4,9 @@ import Observation
 @MainActor @Observable
 final class AppState {
     var selection: SidebarItem = .dashboard
-    var conversations: [Conversation] = [Conversation(title: "Planning my week", messages: ChatMessage.samples)]
+    // Start with a real empty thread. Sample messages must never become part
+    // of Arthur's visible chat or backend conversation context.
+    var conversations: [Conversation] = [Conversation(title: "New conversation")]
     var selectedConversationID: UUID?
     var connectionStatus: BackendConnectionStatus = .disconnected
     var isSending = false
