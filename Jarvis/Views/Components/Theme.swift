@@ -64,20 +64,22 @@ struct CommandOrb: View {
     }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion || !isActive)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion)) { timeline in
             let phase = reduceMotion ? 0 : (sin(timeline.date.timeIntervalSinceReferenceDate * 2.2) + 1) / 2
             ZStack {
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
                         .stroke(signalColor.opacity(0.12 + Double(index) * 0.05), lineWidth: 1)
-                        .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : 0))
+                        .frame(width: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2), height: 180 + CGFloat(index) * 58 + (isActive ? phase * 10 : phase * 2))
                 }
                 Circle().fill(Theme.surface).frame(width: 198, height: 198)
                 Circle().strokeBorder(signalColor.opacity(0.5), lineWidth: 1).frame(width: 188, height: 188)
                 Circle().fill(signalColor.opacity(isActive ? 0.74 : 0.42)).frame(width: 152, height: 152)
                 Circle().strokeBorder(.white.opacity(0.28), lineWidth: 1).frame(width: 116, height: 116)
                 Circle().fill(Theme.background).frame(width: 88, height: 88)
-                Circle().fill(isActive ? Theme.signalCore : signalColor).frame(width: 50, height: 50)
+                Circle()
+                    .fill(RadialGradient(colors: [Theme.signalCore, signalColor, Theme.accentDeep], center: .topLeading, startRadius: 1, endRadius: 36))
+                    .frame(width: 50, height: 50)
                     .shadow(color: signalColor.opacity(isActive ? 0.32 : 0.14), radius: isActive ? 22 : 12, y: 6)
                 Image(systemName: mode == .speaking ? "waveform" : "mic.fill")
                     .font(.system(size: 36, weight: .medium))

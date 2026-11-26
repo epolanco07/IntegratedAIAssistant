@@ -114,15 +114,19 @@ struct VoiceView: View {
     }
 
     private func signalBars(active: Bool) -> some View {
-        HStack(alignment: .bottom, spacing: 3) {
-            ForEach(0..<12, id: \.self) { index in
-                Capsule()
-                    .fill(Theme.accent.opacity(active ? (index.isMultiple(of: 3) ? 1 : 0.55) : 0.24))
-                    .frame(width: 5, height: CGFloat(7 + (index * 11) % 24))
+        TimelineView(.animation(minimumInterval: 1.0 / 24.0)) { timeline in
+            let phase = timeline.date.timeIntervalSinceReferenceDate
+            HStack(alignment: .bottom, spacing: 3) {
+                ForEach(0..<12, id: \.self) { index in
+                    let amplitude = abs(sin(phase * (active ? 4.0 : 1.2) + Double(index) * 0.72))
+                    Capsule()
+                        .fill(Theme.accent.opacity(active ? 0.9 : 0.38))
+                        .frame(width: 5, height: 7 + CGFloat(amplitude) * (active ? 27 : 9))
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 4)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 4)
     }
 
     private var orbMode: CommandOrb.Mode {
@@ -162,7 +166,10 @@ private struct TelemetryPanel<Content: View>: View {
             content
         }
         .padding(13)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(
+            LinearGradient(colors: [Theme.surface.opacity(0.78), Theme.accentDeep.opacity(0.24)], startPoint: .topLeading, endPoint: .bottomTrailing),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+        )
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.border))
     }
 }
