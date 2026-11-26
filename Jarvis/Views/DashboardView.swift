@@ -6,27 +6,25 @@ struct DashboardView: View {
     private let columns = [GridItem(.adaptive(minimum: 260), spacing: 16)]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                header
-                HStack(alignment: .top, spacing: 12) {
-                    coreOverview.frame(width: 180)
-                    assistantCore.frame(maxWidth: .infinity, minHeight: 420)
-                    activityFeed.frame(width: 230)
-                }
-                HStack(alignment: .top, spacing: 12) {
-                    agentsPanel.frame(maxWidth: .infinity)
-                    recentActivity.frame(width: 260)
-                    quickActions.frame(width: 210)
-                }
-                HStack(alignment: .top, spacing: 12) {
-                    systemStatus.frame(width: 300)
-                    recentConversations.frame(maxWidth: .infinity)
-                }
+        VStack(alignment: .leading, spacing: 14) {
+            header
+            HStack(alignment: .top, spacing: 12) {
+                coreOverview.frame(width: 180)
+                assistantCore.frame(maxWidth: .infinity, minHeight: 420)
+                activityFeed.frame(width: 230)
             }
-            .frame(minWidth: 1_040, alignment: .leading)
-            .padding(22)
+            HStack(alignment: .top, spacing: 12) {
+                agentsPanel.frame(maxWidth: .infinity)
+                recentActivity.frame(width: 260)
+                quickActions.frame(width: 210)
+            }
+            HStack(alignment: .top, spacing: 12) {
+                systemStatus.frame(width: 300)
+                recentConversations.frame(maxWidth: .infinity)
+            }
         }
+        .frame(minWidth: 1_040, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(22)
     }
 
     private var header: some View {

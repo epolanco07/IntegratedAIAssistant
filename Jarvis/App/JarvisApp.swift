@@ -13,9 +13,10 @@ struct JarvisApp: App {
                 .environment(appState)
                 .environmentObject(voiceManager)
                 .preferredColorScheme(.dark)
-                .frame(minWidth: 1_280, minHeight: 760)
+                .frame(minWidth: 1_320, minHeight: 900)
                 .task { await voiceManager.startContinuousListening() }
         }
+        .defaultSize(width: 1_440, height: 960)
         .windowToolbarStyle(.unified)
     }
 }
