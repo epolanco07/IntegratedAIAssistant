@@ -20,7 +20,9 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
             request.httpMethod = "POST"
             request.timeoutInterval = 90
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try JSONEncoder().encode(SpeechRequest(text: text))
+            request.httpBody = try JSONEncoder().encode(
+                SpeechRequest(text: text, speed: kokoroSpeed)
+            )
 
             let (audioData, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse,
@@ -58,6 +60,14 @@ final class AudioPlayer: NSObject, ObservableObject, @preconcurrency AVAudioPlay
 
     private struct SpeechRequest: Encodable {
         let text: String
+        let speed: Double
+    }
+
+    /// Maps the existing UI's native-speech-rate range onto Kokoro's natural
+    /// speaking-speed range, keeping the Settings slider and agent command live.
+    private var kokoroSpeed: Double {
+        let nativeRate = Double(AudioConfiguration.preferredSpeechRate)
+        return min(max(0.96 + (nativeRate - AudioConfiguration.defaultSpeechRate) * 1.3, 0.72), 1.18)
     }
 
     private enum PlaybackError: LocalizedError {

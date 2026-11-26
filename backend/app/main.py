@@ -97,6 +97,7 @@ class SpeechRequest(BaseModel):
     """The short reply Arthur should render with his local voice."""
 
     text: str = Field(min_length=1, max_length=5_000)
+    speed: float = Field(default=0.96, ge=0.72, le=1.18)
 
 
 @app.get("/health")
@@ -111,7 +112,7 @@ async def speech(request: SpeechRequest) -> Response:
     """Generate Arthur's reply with the bundled, offline Kokoro voice."""
 
     try:
-        wav = synthesize_speech(request.text)
+        wav = synthesize_speech(request.text, request.speed)
     except Exception as error:
         print(f"Arthur local speech failed: {error}")
         raise HTTPException(status_code=503, detail="Arthur's local voice is unavailable.") from error

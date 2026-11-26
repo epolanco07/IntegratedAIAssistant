@@ -31,7 +31,7 @@ _engine: Kokoro | None = None
 _engine_lock = Lock()
 
 
-def synthesize_speech(text: str) -> bytes:
+def synthesize_speech(text: str, speed: float = ARTHUR_SPEED) -> bytes:
     """Return local Kokoro speech as a standard WAV payload."""
 
     clean_text = text.strip()
@@ -43,7 +43,7 @@ def synthesize_speech(text: str) -> bytes:
         samples, sample_rate = engine.create(
             clean_text,
             voice=ARTHUR_VOICE,
-            speed=ARTHUR_SPEED,
+            speed=min(max(speed, 0.72), 1.18),
             lang=ARTHUR_LANGUAGE,
         )
 
