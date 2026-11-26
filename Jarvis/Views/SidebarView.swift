@@ -8,8 +8,8 @@ struct SidebarView: View {
             HStack(spacing: 10) {
                 AssistantAvatar(size: 34)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("ARTHUR").font(.system(size: 13, weight: .bold, design: .monospaced)).tracking(2)
-                    Text("VOICE BUS").font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.8).foregroundStyle(Theme.accent)
+                    Text("ARTHUR").font(.system(size: 14, weight: .bold, design: .monospaced)).tracking(2.2)
+                    Text("COMMAND CONSOLE").font(.system(size: 8, weight: .bold, design: .monospaced)).tracking(1.1).foregroundStyle(Theme.accent)
                 }
             }
             .padding(16)
@@ -24,7 +24,10 @@ struct SidebarView: View {
             .padding(.horizontal, 8)
 
             HStack {
-                SectionTitle("Conversations")
+                Text("CONVERSATIONS")
+                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .tracking(1.1)
+                    .foregroundStyle(Theme.textSecondary)
                 Button { appState.createConversation() } label: { Image(systemName: "plus") }
                     .buttonStyle(.plain).foregroundStyle(Theme.textSecondary)
                     .help("New conversation")
@@ -50,10 +53,10 @@ struct SidebarView: View {
                 Divider().overlay(Theme.border)
                 HStack(spacing: 7) {
                     Circle().fill(Theme.warning).frame(width: 7, height: 7)
-                    Text("BACKEND OFFLINE").font(.caption2.weight(.medium)).tracking(0.7)
+                    Text("BACKEND OFFLINE").font(.system(size: 9, weight: .bold, design: .monospaced)).tracking(0.8)
                 }
                 .foregroundStyle(Theme.warning)
-                Text("Local preview mode").font(.caption2).foregroundStyle(Theme.textSecondary)
+                Text("LOCAL PREVIEW MODE").font(.system(size: 8, weight: .medium, design: .monospaced)).tracking(0.7).foregroundStyle(Theme.textSecondary)
             }
             .padding(12)
         }
@@ -74,7 +77,7 @@ private struct SidebarRow: View {
                 Image(systemName: systemImage)
                     .frame(width: 18)
                     .foregroundStyle(isSelected ? Theme.accent : Theme.textSecondary)
-                Text(title.uppercased()).font(.system(size: 10, weight: .medium, design: .monospaced)).tracking(0.5).lineLimit(1)
+                Text(title.uppercased()).font(.system(size: 10, weight: .bold, design: .monospaced)).tracking(0.8).lineLimit(1)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 10)
