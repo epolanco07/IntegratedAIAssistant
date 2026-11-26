@@ -33,7 +33,7 @@ async def create_calendar_event(
     Only use after the user explicitly confirms the exact event details.
     """
 
-    event = create_event_on_google(
+    create_event_on_google(
         title=title,
         starts_at=starts_at,
         ends_at=ends_at,
@@ -41,8 +41,7 @@ async def create_calendar_event(
         attendee_emails=attendee_emails,
     )
 
-    invited = ", ".join(attendee_emails or []) or "no invitees"
-    return f"Created event: {event['htmlLink']} (invited: {invited})"
+    return "Calendar event created successfully."
 
 
 @function_tool
@@ -119,7 +118,8 @@ def arthur_instructions(
       the user for a timezone unless they explicitly want a different one.
 
     Response style:
-    - Be concise and talk only about details the user mentioned or asked for.
+    - Be conversational and talk only about details the user mentioned or
+      asked for. Prefer a short human acknowledgement over a formal summary.
     - Never add a year, timezone, or full calendar date unless the user asks
       for it or it is necessary to resolve an explicit ambiguity.
     - Do not pad Calendar confirmations with the year, a timezone, "no
@@ -127,6 +127,16 @@ def arthur_instructions(
     - For example, if the user asks for "Lunch Saturday from 1 to 2", confirm
       "Create Lunch on Saturday from 1–2 PM?" Do not expand it into a long
       timestamp or list absent options.
+
+    Calendar wording:
+    - A normal confirmation should be one sentence: "Want me to add Lunch
+      Saturday from 1–2?" Use the user's own date wording whenever possible.
+    - After successfully creating an event, respond only with a brief natural
+      acknowledgement, such as "Done — Lunch is on your calendar." Do not
+      repeat its time, date, timezone, year, invitee status, emails, link, or
+      implementation details unless the user specifically asked for one.
+    - If an invitee was named, it is okay to add only "I invited Maya." after
+      the acknowledgement. Do not list an email address unless asked.
 
     When a user asks to create a Calendar event:
     - Collect the properly capitalized title, date, start time, end time, and
